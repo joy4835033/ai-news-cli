@@ -32,18 +32,21 @@ jobs:
         env:
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
 
-      - name: Install coscli
-        run: |
-          wget -q https://cosbrowser.cloud.tencent.com/software/coscli/coscli-linux -O coscli
-          chmod +x coscli
+      - name: Install coscmd
+        run: pip install coscmd
 
-      - name: Upload to COS
+      - name: Configure coscmd
         run: |
-          ./coscli cp dist/index.html cos://dailynews-1419760006/index.html \
-            -i $COS_SECRET_ID \
-            -k $COS_SECRET_KEY \
-            -e cos.ap-shanghai.myqcloud.com \
-            --meta "Content-Type:text/html;charset=utf-8"
+          coscmd config \
+            -a $COS_SECRET_ID \
+            -s $COS_SECRET_KEY \
+            -b dailynews-1419760006 \
+            -r ap-shanghai
         env:
           COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
           COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
+
+      - name: Upload to COS
+        run: |
+          coscmd upload -H '{"Content-Type":"text/html; charset=utf-8"}' \
+            dist/index.html index.html
