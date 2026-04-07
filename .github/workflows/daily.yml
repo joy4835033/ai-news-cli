@@ -2,7 +2,7 @@ name: Daily News
 
 on:
   schedule:
-    - cron: '0 1 * * *'  # 北京时间早上9点
+    - cron: '0 1 * * *'
   workflow_dispatch:
 
 jobs:
@@ -21,8 +21,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: List files
+        run: ls -la
+
       - name: Build
-        run: npx ts-node build.ts
+        run: npx ts-node --skip-project build.ts
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
