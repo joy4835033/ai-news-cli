@@ -28,18 +28,9 @@ jobs:
         run: tsc
 
       - name: Build
-        run: node dist_ts/build.js 2>&1
+        run: node dist_ts/build.js
         env:
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
-
-      - name: Check dist exists
-        run: |
-          echo "=== 当前目录 ==="
-          ls -la
-          echo "=== dist目录 ==="
-          ls -la dist || echo "❌ dist目录不存在！"
-          echo "=== dist/index.html ==="
-          cat dist/index.html || echo "❌ index.html不存在！"
 
       - name: Upload to COS
         uses: TencentCloud/cos-action@v1
