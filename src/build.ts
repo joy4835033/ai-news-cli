@@ -104,7 +104,7 @@ async function generateSections(rawJson: string, dateStr: string): Promise<strin
   return response.choices[0].message.content || '{}';
 }
 
-// ── 生成手风琴列表 HTML ───────────────────────────────
+// ── 生成手风琴列表 HTML（纯 CSS details/summary 方案）──
 function newsAccordion(items: any[], extraField?: string): string {
   if (!items.length) return '<p class="empty">暂无相关内容</p>';
   return items.map((item, i) => {
@@ -113,8 +113,8 @@ function newsAccordion(items: any[], extraField?: string): string {
       ? '<span class="acc-tag">' + item[extraField] + '</span>'
       : '';
     return (
-      '<div class="acc-item">' +
-        '<button class="acc-title" data-toggle="accordion" type="button">' +
+      '<details class="acc-item">' +
+        '<summary class="acc-title">' +
           '<span class="acc-index">' + idx + '</span>' +
           '<span class="acc-text">' + item.title + '</span>' +
           '<span class="acc-arrow">' +
@@ -122,12 +122,12 @@ function newsAccordion(items: any[], extraField?: string): string {
               '<path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
             '</svg>' +
           '</span>' +
-        '</button>' +
+        '</summary>' +
         '<div class="acc-body">' +
           '<p>' + (item.summary || '') + '</p>' +
           extra +
         '</div>' +
-      '</div>'
+      '</details>'
     );
   }).join('');
 }
@@ -373,9 +373,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     .insight-card {
       border: 1px solid var(--border); border-radius: var(--radius-md);
       padding: 1.1rem 1.2rem; background: var(--surface-2);
-      transition: box-shadow 0.15s;
     }
-    .insight-card:hover { box-shadow: var(--shadow-sm); }
     .insight-card.accent-blue  { background: var(--accent-light); border-color: var(--accent-mid); }
     .insight-card.accent-amber { background: var(--amber-light);  border-color: var(--amber-mid); }
     .insight-label {
@@ -389,38 +387,53 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     .dot-amber { background: var(--amber); }
     .insight-text { font-size: 0.84rem; color: var(--text-main); line-height: 1.8; }
 
-    /* ── Accordion ── */
+    /* ══════════════════════════════════════
+       ACCORDION — 纯 CSS details/summary
+    ══════════════════════════════════════ */
+
+    /* 去掉浏览器默认的三角箭头 */
+    details.acc-item > summary { list-style: none; }
+    details.acc-item > summary::-webkit-details-marker { display: none; }
+
     .acc-item {
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      margin-bottom: 7px; overflow: hidden;
-      transition: box-shadow 0.15s, border-color 0.15s;
+      margin-bottom: 7px;
+      overflow: hidden;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
     .acc-item:last-child { margin-bottom: 0; }
     .acc-item:hover {
       border-color: var(--accent-mid);
       box-shadow: 0 2px 8px rgba(37,99,235,0.07);
     }
+
+    /* summary 就是点击区域，浏览器原生处理，无需 JS */
     .acc-title {
-      width: 100%; display: flex; align-items: center; gap: 11px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
       padding: 0.85rem 1.1rem;
-      background: var(--surface); border: none; cursor: pointer;
-      text-align: left; transition: background 0.15s;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
+      background: var(--surface);
+      cursor: pointer;
       user-select: none;
-      outline: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s;
+      /* 关键：让整个区域都可点击 */
+      width: 100%;
     }
     .acc-title:hover { background: var(--surface-2); }
-    .acc-title.open  { background: var(--accent-light); }
+    details[open] > .acc-title { background: var(--accent-light); }
+
     .acc-index {
       font-size: 0.62rem; font-weight: 700;
       color: var(--accent); background: var(--accent-light);
       border: 1px solid var(--accent-mid);
       padding: 2px 7px; border-radius: 4px;
       flex-shrink: 0; min-width: 28px; text-align: center;
+      transition: background 0.15s, color 0.15s;
     }
-    .acc-title.open .acc-index {
+    details[open] > .acc-title .acc-index {
       background: var(--accent); color: #fff; border-color: var(--accent);
     }
     .acc-text {
@@ -432,15 +445,17 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       transition: transform 0.22s ease, color 0.15s;
       flex-shrink: 0; display: flex; align-items: center;
     }
-    .acc-title.open .acc-arrow { transform: rotate(90deg); color: var(--accent); }
+    details[open] > .acc-title .acc-arrow {
+      transform: rotate(90deg);
+      color: var(--accent);
+    }
+
     .acc-body {
-      display: none;
       padding: 1rem 1.1rem 1.1rem 3rem;
       background: linear-gradient(180deg, var(--accent-light) 0%, var(--surface) 100%);
       border-top: 1px solid var(--border-light);
       font-size: 0.86rem; color: var(--text-sub); line-height: 1.9;
     }
-    .acc-body.open { display: block; }
     .acc-body p { margin-bottom: 0.5rem; }
     .acc-body p:last-child { margin-bottom: 0; }
     .acc-tag {
@@ -491,9 +506,9 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
         background: var(--surface-2); border: 1px solid var(--border);
         border-radius: 20px; font-size: 0.78rem;
       }
-      .section { padding: 1rem 1rem; }
+      .section { padding: 1rem; }
       .insight-grid { grid-template-columns: 1fr; gap: 0.75rem; }
-      .acc-title { padding: 0.8rem 0.9rem; min-height: 48px; }
+      .acc-title { padding: 0.9rem 1rem; min-height: 52px; }
       .acc-body  { padding: 0.85rem 0.9rem 0.9rem 2.4rem; }
       footer {
         flex-direction: column; gap: 0.5rem;
@@ -505,35 +520,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       .acc-text { font-size: 0.84rem; }
       .section  { padding: 0.9rem; }
     }
-  `;
-
-  // ── 关键修复：用 pointerdown 替代 click+touchend ──
-  const script = `
-    (function() {
-      function doToggle(btn) {
-        var body = btn.nextElementSibling;
-        if (!body) return;
-        var isOpen = btn.classList.contains('open');
-        var section = btn.closest('.section');
-        if (section) {
-          section.querySelectorAll('.acc-title.open').forEach(function(ob) {
-            if (ob !== btn) {
-              ob.classList.remove('open');
-              ob.nextElementSibling.classList.remove('open');
-            }
-          });
-        }
-        btn.classList.toggle('open', !isOpen);
-        body.classList.toggle('open', !isOpen);
-      }
-
-      document.addEventListener('pointerdown', function(e) {
-        var btn = e.target.closest('[data-toggle="accordion"]');
-        if (!btn) return;
-        e.preventDefault();
-        doToggle(btn);
-      });
-    })();
   `;
 
   return (
@@ -579,7 +565,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     '  <div class="footer-left">Joy 每日新闻播报 · ' + dateStr + ' · ' + weekDay + '</div>\n' +
     '  <div class="footer-right">Powered by Moonshot AI</div>\n' +
     '</footer>\n' +
-    '<script>' + script + '<\/script>\n' +
     '</body>\n' +
     '</html>'
   );
