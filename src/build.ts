@@ -40,7 +40,7 @@ function articlesToPromptJson(articles: Article[]): string {
   const simplified = articles.map((a, i) => ({
     id: i + 1,
     title: a.title,
-    summary: a.summary.slice(0, 200),
+    summary: a.summary.slice(0, 300),
     source: a.source,
     time: a.publishedAt.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
   }));
@@ -52,46 +52,51 @@ async function generateSections(rawJson: string, dateStr: string): Promise<strin
   const prompt = '你是一位专业的AI科技日报主编，今天是' + dateStr + '。\n\n'
     + '以下是今日抓取的原始新闻列表（JSON格式）：\n'
     + rawJson + '\n\n'
-    + '请根据这些新闻，生成一份结构化日报，严格按以下JSON格式返回，不要有任何多余内容：\n\n'
+    + '请根据这些新闻生成结构化日报，严格按以下JSON格式返回，不要有任何多余内容。\n\n'
+    + '【重要】每条新闻的 summary 字段必须严格满足：\n'
+    + '1. 字数：80到120个中文字符，绝对不能少于80字\n'
+    + '2. 内容：第一句说明事件是什么，第二句说明背景或原因，第三句说明影响或意义\n'
+    + '3. 语言：简洁专业，不使用"该公司""此次"等模糊表达，直接说主语\n'
+    + '4. 禁止：不得只写一句话，不得少于三句话\n\n'
+    + '返回格式：\n'
     + '{\n'
     + '  "cat1": {\n'
     + '    "highlights": [\n'
-    + '      { "title": "新闻标题", "summary": "50-100字的中文摘要，需包含事件背景、核心内容和影响，语言简洁专业" }\n'
+    + '      { "title": "中文标题", "summary": "80-120字三句话摘要" }\n'
     + '    ],\n'
-    + '    "crossSector": "跨板块关联分析，100字以内",\n'
-    + '    "startupAdvice": "创业方向建议，100字以内",\n'
-    + '    "riskWarning": "风险预警，100字以内"\n'
+    + '    "crossSector": "跨板块关联分析100字以内",\n'
+    + '    "startupAdvice": "创业方向建议100字以内",\n'
+    + '    "riskWarning": "风险预警100字以内"\n'
     + '  },\n'
     + '  "cat2": [\n'
-    + '    { "title": "行业动态标题", "summary": "50-100字的中文摘要，需包含事件背景、核心内容和影响，语言简洁专业", "company": "相关企业名" }\n'
+    + '    { "title": "中文标题", "summary": "80-120字三句话摘要", "company": "企业名" }\n'
     + '  ],\n'
     + '  "cat3": [\n'
-    + '    { "title": "投融资新闻标题", "summary": "50-100字的中文摘要，需包含融资方、投资方、金额用途及行业意义", "amount": "融资金额（如有）" }\n'
+    + '    { "title": "中文标题", "summary": "80-120字三句话摘要", "amount": "融资金额" }\n'
     + '  ],\n'
     + '  "cat4": [\n'
-    + '    { "title": "技术突破标题", "summary": "50-100字的中文摘要，需包含技术原理、突破点和应用前景" }\n'
+    + '    { "title": "中文标题", "summary": "80-120字三句话摘要" }\n'
     + '  ],\n'
     + '  "cat5": [\n'
-    + '    { "title": "产品上线标题", "summary": "50-100字的中文摘要，需包含产品功能、目标用户和市场定位", "product": "产品名" }\n'
+    + '    { "title": "中文标题", "summary": "80-120字三句话摘要", "product": "产品名" }\n'
     + '  ],\n'
     + '  "cat6": [\n'
-    + '    { "title": "AI教育资讯标题", "summary": "50-100字的中文摘要，需包含内容特点、受众群体和教育价值" }\n'
+    + '    { "title": "中文标题", "summary": "80-120字三句话摘要" }\n'
     + '  ]\n'
     + '}\n\n'
     + '分类规则：\n'
-    + '- cat1.highlights：选3-5条今日最重要新闻做摘录，标题翻译成中文\n'
-    + '- cat2：行业头部企业动态，如 OpenAI / Google / Meta / Microsoft / Anthropic 等，选3-5条\n'
-    + '- cat3：含融资、投资、估值、收购等关键词的新闻，选3-5条\n'
-    + '- cat4：模型发布、算法突破、硬件革新等技术类新闻，选3-5条\n'
-    + '- cat5：新产品/功能上线、App发布、平台更新，选3-5条\n'
-    + '- cat6：AI教育、学习工具、在线课程、技能培训相关，选3-5条\n'
-    + '- 某类没有相关内容则返回空数组 []\n'
-    + '- 所有 title 和 summary 必须是中文\n'
-    + '- summary 字数严格控制在50-100字之间，不得少于50字\n'
-    + '- 不要编造原始新闻中没有的内容';
+    + '- cat1.highlights：今日最重要3-5条，标题译成中文\n'
+    + '- cat2：OpenAI/Google/Meta/Microsoft/Anthropic等头部企业动态，3-5条\n'
+    + '- cat3：融资/投资/估值/收购新闻，3-5条\n'
+    + '- cat4：模型发布/算法突破/硬件革新，3-5条\n'
+    + '- cat5：新产品/功能上线/App发布/平台更新，3-5条\n'
+    + '- cat6：AI教育/学习工具/在线课程/技能培训，3-5条\n'
+    + '- 无相关内容返回空数组[]\n'
+    + '- 所有title和summary必须是中文\n'
+    + '- 不得编造原始新闻中没有的内容';
 
   const response = await client.chat.completions.create({
-    model: 'moonshot-v1-8k',
+    model: 'moonshot-v1-32k',
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
   });
@@ -109,7 +114,7 @@ function newsAccordion(items: any[], extraField?: string): string {
       : '';
     return (
       '<div class="acc-item">' +
-        '<button class="acc-title" data-toggle="accordion">' +
+        '<button class="acc-title" data-toggle="accordion" type="button">' +
           '<span class="acc-index">' + idx + '</span>' +
           '<span class="acc-text">' + item.title + '</span>' +
           '<span class="acc-arrow">' +
@@ -190,12 +195,12 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
   ).join('');
 
   const navItems = [
-    { id: 1, icon: '📋', label: '综合要闻'   },
-    { id: 2, icon: '🏭', label: '行业动态'   },
-    { id: 3, icon: '💰', label: '投资融资'   },
-    { id: 4, icon: '⚡', label: '技术突破'   },
-    { id: 5, icon: '📦', label: '产品上线'   },
-    { id: 6, icon: '🎓', label: 'AI 教育'    },
+    { id: 1, icon: '📋', label: '综合要闻' },
+    { id: 2, icon: '🏭', label: '行业动态' },
+    { id: 3, icon: '💰', label: '投资融资' },
+    { id: 4, icon: '⚡', label: '技术突破' },
+    { id: 5, icon: '📦', label: '产品上线' },
+    { id: 6, icon: '🎓', label: 'AI 教育'  },
   ];
 
   const navHTML = navItems.map(n =>
@@ -210,7 +215,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
 
     :root {
       --primary:      #0f2744;
-      --primary-mid:  #1a3a5c;
       --accent:       #2563eb;
       --accent-light: #eff6ff;
       --accent-mid:   #bfdbfe;
@@ -233,7 +237,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     }
 
     body {
-      font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+      font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg);
       color: var(--text-main);
       line-height: 1.75;
@@ -261,12 +265,8 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       background: linear-gradient(90deg, #2563eb 0%, #60a5fa 50%, #2563eb 100%);
     }
     .header-inner {
-      max-width: 1240px;
-      margin: 0 auto;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      max-width: 1240px; margin: 0 auto; width: 100%;
+      display: flex; align-items: center; justify-content: space-between;
     }
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand-mark {
@@ -278,17 +278,11 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       box-shadow: 0 2px 8px rgba(37,99,235,0.4);
       flex-shrink: 0;
     }
-    .brand-name {
-      font-size: 1rem; font-weight: 700;
-      color: #f1f5f9; letter-spacing: 0.3px;
-    }
-    .brand-sub {
-      font-size: 0.65rem; color: #64a0d4;
-      letter-spacing: 2.5px; margin-top: 2px; font-weight: 500;
-    }
+    .brand-name { font-size: 1rem; font-weight: 700; color: #f1f5f9; letter-spacing: 0.3px; }
+    .brand-sub  { font-size: 0.65rem; color: #64a0d4; letter-spacing: 2.5px; margin-top: 2px; }
     .header-right { display: flex; align-items: center; gap: 1.5rem; }
     .header-date-block { text-align: right; }
-    .date-main { font-size: 0.88rem; font-weight: 600; color: #e2e8f0; letter-spacing: 0.5px; }
+    .date-main { font-size: 0.88rem; font-weight: 600; color: #e2e8f0; }
     .date-week { font-size: 0.68rem; color: #64a0d4; margin-top: 2px; letter-spacing: 1px; }
     .header-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.12); }
     .header-tag {
@@ -300,8 +294,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
 
     /* ── Layout ── */
     .layout {
-      max-width: 1240px;
-      margin: 1.75rem auto;
+      max-width: 1240px; margin: 1.75rem auto;
       padding: 0 1.5rem;
       display: grid;
       grid-template-columns: 172px 1fr;
@@ -315,8 +308,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 1rem 0.75rem;
-      position: sticky;
-      top: 76px;
+      position: sticky; top: 76px;
       box-shadow: var(--shadow-sm);
     }
     .sidenav-title {
@@ -337,7 +329,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     .nav-link:hover { background: var(--accent-light); color: var(--accent); }
     .nav-icon { font-size: 0.9rem; flex-shrink: 0; }
 
-    /* ── Section Cards ── */
+    /* ── Sections ── */
     .main-content { display: flex; flex-direction: column; gap: 1.25rem; }
     .section {
       background: var(--surface);
@@ -355,14 +347,11 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     }
     .sec-header-left { display: flex; align-items: center; gap: 9px; }
     .sec-icon { font-size: 1.05rem; }
-    .sec-header h2 {
-      font-size: 0.97rem; font-weight: 700;
-      color: var(--primary); letter-spacing: 0.2px;
-    }
+    .sec-header h2 { font-size: 0.97rem; font-weight: 700; color: var(--primary); }
     .sec-badge {
       font-size: 0.68rem; font-weight: 600; color: var(--text-mute);
       background: var(--surface-2); border: 1px solid var(--border);
-      padding: 3px 11px; border-radius: 20px; letter-spacing: 0.3px;
+      padding: 3px 11px; border-radius: 20px;
     }
 
     /* ── Sub Label ── */
@@ -374,9 +363,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       margin-bottom: 0.8rem;
       display: flex; align-items: center; gap: 8px;
     }
-    .sub-label::after {
-      content: ''; flex: 1; height: 1px; background: var(--border-light);
-    }
+    .sub-label::after { content: ''; flex: 1; height: 1px; background: var(--border-light); }
 
     /* ── Insight Grid ── */
     .insight-grid {
@@ -384,19 +371,17 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       gap: 1rem; margin-top: 1.1rem;
     }
     .insight-card {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 1.1rem 1.2rem;
-      background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 1.1rem 1.2rem; background: var(--surface-2);
       transition: box-shadow 0.15s;
     }
     .insight-card:hover { box-shadow: var(--shadow-sm); }
     .insight-card.accent-blue  { background: var(--accent-light); border-color: var(--accent-mid); }
-    .insight-card.accent-amber { background: var(--amber-light);  border-color: var(--amber-mid);  }
+    .insight-card.accent-amber { background: var(--amber-light);  border-color: var(--amber-mid); }
     .insight-label {
       font-size: 0.72rem; font-weight: 700; color: var(--text-sub);
       margin-bottom: 0.6rem;
-      display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px;
+      display: flex; align-items: center; gap: 6px;
     }
     .insight-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .dot-gray  { background: var(--text-mute); }
@@ -424,6 +409,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
       user-select: none;
+      outline: none;
     }
     .acc-title:hover { background: var(--surface-2); }
     .acc-title.open  { background: var(--accent-light); }
@@ -432,8 +418,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       color: var(--accent); background: var(--accent-light);
       border: 1px solid var(--accent-mid);
       padding: 2px 7px; border-radius: 4px;
-      flex-shrink: 0; letter-spacing: 0.5px;
-      min-width: 28px; text-align: center;
+      flex-shrink: 0; min-width: 28px; text-align: center;
     }
     .acc-title.open .acc-index {
       background: var(--accent); color: #fff; border-color: var(--accent);
@@ -464,7 +449,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       font-size: 0.72rem; font-weight: 600;
       color: var(--accent); background: var(--accent-light);
       border: 1px solid var(--accent-mid);
-      padding: 2px 10px; border-radius: 4px; letter-spacing: 0.3px;
+      padding: 2px 10px; border-radius: 4px;
     }
 
     .empty { font-size: 0.84rem; color: var(--text-mute); padding: 0.75rem 0; font-style: italic; }
@@ -476,11 +461,11 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       border-top: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
     }
-    .footer-left  { font-size: 0.72rem; color: var(--text-mute); letter-spacing: 0.5px; }
+    .footer-left  { font-size: 0.72rem; color: var(--text-mute); }
     .footer-right {
       font-size: 0.68rem; color: var(--text-mute);
       background: var(--surface-2); border: 1px solid var(--border);
-      padding: 3px 12px; border-radius: 20px; letter-spacing: 0.5px;
+      padding: 3px 12px; border-radius: 20px;
     }
 
     /* ── Scrollbar ── */
@@ -493,14 +478,12 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     @media (max-width: 768px) {
       header { padding: 0 1rem; height: 56px; }
       .header-divider, .header-tag { display: none; }
-      .brand-name { font-size: 0.92rem; }
       .layout {
         grid-template-columns: 1fr;
-        margin: 1rem auto; padding: 0 1rem; gap: 1rem;
+        margin: 1rem auto; padding: 0 0.75rem; gap: 0.85rem;
       }
       .sidenav {
-        position: static; display: flex; flex-wrap: wrap;
-        gap: 6px; padding: 0.75rem;
+        position: static; display: flex; flex-wrap: wrap; gap: 6px; padding: 0.75rem;
       }
       .sidenav-title { width: 100%; margin-bottom: 0.2rem; }
       .nav-link {
@@ -508,44 +491,49 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
         background: var(--surface-2); border: 1px solid var(--border);
         border-radius: 20px; font-size: 0.78rem;
       }
-      .section { padding: 1.1rem; }
+      .section { padding: 1rem 1rem; }
       .insight-grid { grid-template-columns: 1fr; gap: 0.75rem; }
-      .acc-title { padding: 0.75rem 0.9rem; }
-      .acc-body  { padding: 0.85rem 0.9rem 0.9rem 2.5rem; }
+      .acc-title { padding: 0.8rem 0.9rem; min-height: 48px; }
+      .acc-body  { padding: 0.85rem 0.9rem 0.9rem 2.4rem; }
       footer {
         flex-direction: column; gap: 0.5rem;
-        text-align: center; padding: 1.25rem 1rem 0;
-        margin-bottom: 1.5rem;
+        text-align: center; padding: 1.25rem 1rem 0; margin-bottom: 1.5rem;
       }
     }
 
     @media (max-width: 400px) {
       .acc-text { font-size: 0.84rem; }
-      .section  { padding: 1rem; }
+      .section  { padding: 0.9rem; }
     }
   `;
 
+  // ── 关键修复：用 pointerdown 替代 click+touchend ──
   const script = `
-    function handleToggle(e) {
-      var btn = e.target.closest('[data-toggle="accordion"]');
-      if (!btn) return;
-      e.preventDefault();
-      var body = btn.nextElementSibling;
-      var isOpen = btn.classList.contains('open');
-      var section = btn.closest('.section');
-      if (section) {
-        section.querySelectorAll('.acc-title.open').forEach(function(openBtn) {
-          if (openBtn !== btn) {
-            openBtn.classList.remove('open');
-            openBtn.nextElementSibling.classList.remove('open');
-          }
-        });
+    (function() {
+      function doToggle(btn) {
+        var body = btn.nextElementSibling;
+        if (!body) return;
+        var isOpen = btn.classList.contains('open');
+        var section = btn.closest('.section');
+        if (section) {
+          section.querySelectorAll('.acc-title.open').forEach(function(ob) {
+            if (ob !== btn) {
+              ob.classList.remove('open');
+              ob.nextElementSibling.classList.remove('open');
+            }
+          });
+        }
+        btn.classList.toggle('open', !isOpen);
+        body.classList.toggle('open', !isOpen);
       }
-      btn.classList.toggle('open', !isOpen);
-      body.classList.toggle('open', !isOpen);
-    }
-    document.addEventListener('click',    handleToggle);
-    document.addEventListener('touchend', handleToggle);
+
+      document.addEventListener('pointerdown', function(e) {
+        var btn = e.target.closest('[data-toggle="accordion"]');
+        if (!btn) return;
+        e.preventDefault();
+        doToggle(btn);
+      });
+    })();
   `;
 
   return (
