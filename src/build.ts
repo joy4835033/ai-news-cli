@@ -104,9 +104,9 @@ async function generateSections(rawJson: string, dateStr: string): Promise<strin
   return response.choices[0].message.content || '{}';
 }
 
-// ── 生成手风琴列表 HTML（纯 CSS details/summary 方案）──
+// ── 生成手风琴列表 HTML ───────────────────────────────
 function newsAccordion(items: any[], extraField?: string): string {
-  if (!items.length) return '<p class="empty">暂无相关内容</p>';
+  if (!items.length) return '<div class="empty">· 暂无相关内容 ·</div>';
   return items.map((item, i) => {
     const idx = String(i + 1).padStart(2, '0');
     const extra = extraField && item[extraField]
@@ -132,7 +132,7 @@ function newsAccordion(items: any[], extraField?: string): string {
   }).join('');
 }
 
-// ── 拼装完整 HTML ─────────────────────────────────────
+// ── 拼装完整 HTML（深色科技风）────────────────────────
 function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: number): string {
   const data = JSON.parse(jsonStr);
 
@@ -144,14 +144,15 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
   const cat5 = data.cat5 || [];
   const cat6 = data.cat6 || [];
 
+  // ── 综合要闻 section ──
   const cat1HTML =
-    '<div class="section" id="sec-1">' +
+    '<section class="section" id="sec-1">' +
       '<div class="sec-header">' +
         '<div class="sec-header-left">' +
           '<span class="sec-icon">📋</span>' +
           '<h2>综合要闻</h2>' +
         '</div>' +
-        '<span class="sec-badge">' + total + ' 篇</span>' +
+        '<span class="sec-badge">今日收录 ' + total + ' 篇</span>' +
       '</div>' +
       '<div class="sub-block">' +
         '<div class="sub-label">今日新闻摘录</div>' +
@@ -159,20 +160,21 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       '</div>' +
       '<div class="insight-grid">' +
         '<div class="insight-card">' +
-          '<div class="insight-label"><span class="insight-dot dot-gray"></span>跨板块关联</div>' +
+          '<div class="insight-label"><span class="insight-dot dot-purple"></span>跨板块关联</div>' +
           '<div class="insight-text">' + (cat1.crossSector || '暂无分析') + '</div>' +
         '</div>' +
-        '<div class="insight-card accent-blue">' +
-          '<div class="insight-label"><span class="insight-dot dot-blue"></span>创业方向建议</div>' +
+        '<div class="insight-card accent-cyan">' +
+          '<div class="insight-label"><span class="insight-dot dot-cyan"></span>创业方向建议</div>' +
           '<div class="insight-text">' + (cat1.startupAdvice || '暂无建议') + '</div>' +
         '</div>' +
-        '<div class="insight-card accent-amber">' +
-          '<div class="insight-label"><span class="insight-dot dot-amber"></span>风险预警</div>' +
+        '<div class="insight-card accent-pink">' +
+          '<div class="insight-label"><span class="insight-dot dot-pink"></span>风险预警</div>' +
           '<div class="insight-text">' + (cat1.riskWarning || '暂无预警') + '</div>' +
         '</div>' +
       '</div>' +
-    '</div>';
+    '</section>';
 
+  // ── 其他 section ──
   const sections = [
     { id: 2, icon: '🏭', title: '行业动态',    items: cat2, extra: 'company' },
     { id: 3, icon: '💰', title: '投资融资',    items: cat3, extra: 'amount'  },
@@ -182,7 +184,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
   ];
 
   const otherHTML = sections.map(s =>
-    '<div class="section" id="sec-' + s.id + '">' +
+    '<section class="section" id="sec-' + s.id + '">' +
       '<div class="sec-header">' +
         '<div class="sec-header-left">' +
           '<span class="sec-icon">' + s.icon + '</span>' +
@@ -191,9 +193,10 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
         '<span class="sec-badge">' + s.items.length + ' 条</span>' +
       '</div>' +
       newsAccordion(s.items, s.extra || undefined) +
-    '</div>'
+    '</section>'
   ).join('');
 
+  // ── 导航 ──
   const navItems = [
     { id: 1, icon: '📋', label: '综合要闻' },
     { id: 2, icon: '🏭', label: '行业动态' },
@@ -210,44 +213,43 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     '</a>'
   ).join('');
 
+  // ── CSS（深色科技风）──
   const css = `
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --primary:      #0f2744;
-      --accent:       #2563eb;
-      --accent-light: #eff6ff;
-      --accent-mid:   #bfdbfe;
-      --border:       #e4e9f0;
-      --border-light: #f0f4f8;
-      --bg:           #f0f4f8;
-      --surface:      #ffffff;
-      --surface-2:    #f8fafc;
-      --text-main:    #0f172a;
-      --text-sub:     #475569;
-      --text-mute:    #94a3b8;
-      --amber:        #d97706;
-      --amber-light:  #fffbeb;
-      --amber-mid:    #fde68a;
-      --radius-lg:    14px;
-      --radius-md:    10px;
-      --radius-sm:    6px;
-      --shadow-sm:    0 1px 3px rgba(15,39,68,0.06), 0 1px 2px rgba(15,39,68,0.04);
-      --shadow-md:    0 4px 12px rgba(15,39,68,0.08), 0 2px 4px rgba(15,39,68,0.04);
+      --bg:        #0a0a0f;
+      --bg2:       #0f0f1a;
+      --card:      #13131f;
+      --border:    #1e1e35;
+      --border2:   #252540;
+      --accent:    #7c6aff;
+      --cyan:      #00e5ff;
+      --pink:      #ff6b9d;
+      --text:      #e8e8f0;
+      --muted:     #6b6b8a;
+      --muted2:    #4a4a6a;
+      --radius-lg: 12px;
+      --radius-md: 8px;
+      --radius-sm: 5px;
     }
 
     body {
-      font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: 'Noto Sans SC', 'Space Grotesk', -apple-system, sans-serif;
       background: var(--bg);
-      color: var(--text-main);
-      line-height: 1.75;
+      color: var(--text);
+      line-height: 1.7;
       font-size: 14px;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Header ── */
+    /* ══ HEADER ══ */
     header {
-      background: var(--primary);
+      background: rgba(10,10,15,0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
       height: 64px;
       display: flex;
       align-items: center;
@@ -255,14 +257,13 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       position: sticky;
       top: 0;
       z-index: 200;
-      box-shadow: 0 2px 16px rgba(15,39,68,0.25);
     }
     header::after {
       content: '';
       position: absolute;
       bottom: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, #2563eb 0%, #60a5fa 50%, #2563eb 100%);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--cyan), var(--accent), transparent);
     }
     .header-inner {
       max-width: 1240px; margin: 0 auto; width: 100%;
@@ -271,28 +272,34 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand-mark {
       width: 36px; height: 36px;
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      background: linear-gradient(135deg, var(--accent) 0%, #5b4fd4 100%);
       border-radius: 9px;
       display: flex; align-items: center; justify-content: center;
       font-size: 17px;
-      box-shadow: 0 2px 8px rgba(37,99,235,0.4);
+      box-shadow: 0 0 16px rgba(124,106,255,0.4);
       flex-shrink: 0;
     }
-    .brand-name { font-size: 1rem; font-weight: 700; color: #f1f5f9; letter-spacing: 0.3px; }
-    .brand-sub  { font-size: 0.65rem; color: #64a0d4; letter-spacing: 2.5px; margin-top: 2px; }
+    .brand-name {
+      font-size: 1rem; font-weight: 700; color: var(--text);
+      letter-spacing: 0.3px;
+    }
+    .brand-sub {
+      font-size: 0.62rem; color: var(--muted);
+      letter-spacing: 3px; margin-top: 2px;
+    }
     .header-right { display: flex; align-items: center; gap: 1.5rem; }
     .header-date-block { text-align: right; }
-    .date-main { font-size: 0.88rem; font-weight: 600; color: #e2e8f0; }
-    .date-week { font-size: 0.68rem; color: #64a0d4; margin-top: 2px; letter-spacing: 1px; }
-    .header-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.12); }
+    .date-main { font-size: 0.88rem; font-weight: 600; color: var(--text); font-family: 'Space Grotesk', monospace; }
+    .date-week { font-size: 0.65rem; color: var(--muted); margin-top: 2px; letter-spacing: 2px; }
+    .header-divider { width: 1px; height: 28px; background: var(--border2); }
     .header-tag {
-      font-size: 0.68rem; font-weight: 600; color: #93c5fd;
-      background: rgba(37,99,235,0.2);
-      border: 1px solid rgba(37,99,235,0.35);
-      padding: 3px 10px; border-radius: 20px; letter-spacing: 1px;
+      font-size: 0.65rem; font-weight: 600; color: var(--cyan);
+      border: 1px solid rgba(0,229,255,0.3);
+      background: rgba(0,229,255,0.06);
+      padding: 3px 10px; border-radius: 20px; letter-spacing: 2px;
     }
 
-    /* ── Layout ── */
+    /* ══ LAYOUT ══ */
     .layout {
       max-width: 1240px; margin: 1.75rem auto;
       padding: 0 1.5rem;
@@ -302,20 +309,19 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       align-items: start;
     }
 
-    /* ── Sidenav ── */
+    /* ══ SIDENAV ══ */
     .sidenav {
-      background: var(--surface);
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 1rem 0.75rem;
       position: sticky; top: 76px;
-      box-shadow: var(--shadow-sm);
     }
     .sidenav-title {
-      font-size: 0.62rem; font-weight: 700; color: var(--text-mute);
-      letter-spacing: 2.5px; text-transform: uppercase;
+      font-size: 0.6rem; font-weight: 700; color: var(--muted2);
+      letter-spacing: 3px; text-transform: uppercase;
       padding: 0 0.5rem 0.65rem;
-      border-bottom: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border);
       margin-bottom: 0.6rem;
     }
     .nav-link {
@@ -323,125 +329,141 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       padding: 0.5rem 0.65rem;
       border-radius: var(--radius-sm);
       font-size: 0.82rem; font-weight: 500;
-      color: var(--text-sub); text-decoration: none;
+      color: var(--muted); text-decoration: none;
       transition: all 0.15s ease; margin-bottom: 2px;
     }
-    .nav-link:hover { background: var(--accent-light); color: var(--accent); }
+    .nav-link:hover {
+      background: rgba(124,106,255,0.1);
+      color: var(--accent);
+    }
     .nav-icon { font-size: 0.9rem; flex-shrink: 0; }
 
-    /* ── Sections ── */
+    /* ══ SECTIONS ══ */
     .main-content { display: flex; flex-direction: column; gap: 1.25rem; }
+
     .section {
-      background: var(--surface);
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 1.6rem 1.8rem;
-      box-shadow: var(--shadow-sm);
-      transition: box-shadow 0.2s;
+      transition: border-color 0.2s;
     }
-    .section:hover { box-shadow: var(--shadow-md); }
+    .section:hover { border-color: var(--border2); }
+
     .sec-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 1.3rem; padding-bottom: 0.9rem;
-      border-bottom: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border);
     }
     .sec-header-left { display: flex; align-items: center; gap: 9px; }
     .sec-icon { font-size: 1.05rem; }
-    .sec-header h2 { font-size: 0.97rem; font-weight: 700; color: var(--primary); }
+    .sec-header h2 {
+      font-size: 0.95rem; font-weight: 700; color: var(--text);
+      letter-spacing: 0.5px;
+    }
     .sec-badge {
-      font-size: 0.68rem; font-weight: 600; color: var(--text-mute);
-      background: var(--surface-2); border: 1px solid var(--border);
-      padding: 3px 11px; border-radius: 20px;
+      font-size: 0.65rem; font-weight: 600; color: var(--muted);
+      background: var(--bg2); border: 1px solid var(--border);
+      padding: 3px 11px; border-radius: 20px; letter-spacing: 1px;
     }
 
-    /* ── Sub Label ── */
+    /* ══ SUB LABEL ══ */
     .sub-block { margin-bottom: 1.3rem; }
     .sub-block:last-child { margin-bottom: 0; }
     .sub-label {
-      font-size: 0.7rem; font-weight: 700; color: var(--text-sub);
-      text-transform: uppercase; letter-spacing: 2px;
+      font-size: 0.62rem; font-weight: 700; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: 3px;
       margin-bottom: 0.8rem;
       display: flex; align-items: center; gap: 8px;
     }
-    .sub-label::after { content: ''; flex: 1; height: 1px; background: var(--border-light); }
+    .sub-label::after {
+      content: ''; flex: 1; height: 1px;
+      background: var(--border);
+    }
 
-    /* ── Insight Grid ── */
+    /* ══ INSIGHT GRID ══ */
     .insight-grid {
       display: grid; grid-template-columns: repeat(3, 1fr);
       gap: 1rem; margin-top: 1.1rem;
     }
     .insight-card {
-      border: 1px solid var(--border); border-radius: var(--radius-md);
-      padding: 1.1rem 1.2rem; background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.1rem 1.2rem;
+      background: var(--bg2);
     }
-    .insight-card.accent-blue  { background: var(--accent-light); border-color: var(--accent-mid); }
-    .insight-card.accent-amber { background: var(--amber-light);  border-color: var(--amber-mid); }
+    .insight-card.accent-cyan {
+      background: rgba(0,229,255,0.04);
+      border-color: rgba(0,229,255,0.2);
+    }
+    .insight-card.accent-pink {
+      background: rgba(255,107,157,0.04);
+      border-color: rgba(255,107,157,0.2);
+    }
     .insight-label {
-      font-size: 0.72rem; font-weight: 700; color: var(--text-sub);
+      font-size: 0.68rem; font-weight: 700; color: var(--muted);
       margin-bottom: 0.6rem;
       display: flex; align-items: center; gap: 6px;
+      letter-spacing: 1px;
     }
     .insight-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .dot-gray  { background: var(--text-mute); }
-    .dot-blue  { background: var(--accent); }
-    .dot-amber { background: var(--amber); }
-    .insight-text { font-size: 0.84rem; color: var(--text-main); line-height: 1.8; }
+    .dot-purple { background: var(--accent); box-shadow: 0 0 6px rgba(124,106,255,0.6); }
+    .dot-cyan   { background: var(--cyan);   box-shadow: 0 0 6px rgba(0,229,255,0.6); }
+    .dot-pink   { background: var(--pink);   box-shadow: 0 0 6px rgba(255,107,157,0.6); }
+    .insight-text { font-size: 0.83rem; color: var(--muted); line-height: 1.85; }
 
-    /* ══════════════════════════════════════
-       ACCORDION — 纯 CSS details/summary
-    ══════════════════════════════════════ */
-
-    /* 去掉浏览器默认的三角箭头 */
+    /* ══ ACCORDION ══ */
     details.acc-item > summary { list-style: none; }
     details.acc-item > summary::-webkit-details-marker { display: none; }
 
     .acc-item {
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      margin-bottom: 7px;
+      margin-bottom: 6px;
       overflow: hidden;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      transition: border-color 0.15s;
     }
     .acc-item:last-child { margin-bottom: 0; }
-    .acc-item:hover {
-      border-color: var(--accent-mid);
-      box-shadow: 0 2px 8px rgba(37,99,235,0.07);
-    }
+    .acc-item:hover { border-color: var(--accent); }
 
-    /* summary 就是点击区域，浏览器原生处理，无需 JS */
     .acc-title {
-      display: flex;
-      align-items: center;
-      gap: 11px;
+      display: flex; align-items: center; gap: 12px;
       padding: 0.85rem 1.1rem;
-      background: var(--surface);
+      background: var(--bg2);
       cursor: pointer;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
       transition: background 0.15s;
-      /* 关键：让整个区域都可点击 */
       width: 100%;
     }
-    .acc-title:hover { background: var(--surface-2); }
-    details[open] > .acc-title { background: var(--accent-light); }
+    .acc-title:hover { background: rgba(124,106,255,0.06); }
+    details[open] > .acc-title {
+      background: rgba(124,106,255,0.1);
+      border-bottom: 1px solid var(--border);
+    }
 
     .acc-index {
-      font-size: 0.62rem; font-weight: 700;
-      color: var(--accent); background: var(--accent-light);
-      border: 1px solid var(--accent-mid);
+      font-size: 0.6rem; font-weight: 700;
+      color: var(--accent);
+      background: rgba(124,106,255,0.12);
+      border: 1px solid rgba(124,106,255,0.25);
       padding: 2px 7px; border-radius: 4px;
       flex-shrink: 0; min-width: 28px; text-align: center;
-      transition: background 0.15s, color 0.15s;
+      font-family: 'Space Grotesk', monospace;
+      transition: all 0.15s;
     }
     details[open] > .acc-title .acc-index {
-      background: var(--accent); color: #fff; border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 0 8px rgba(124,106,255,0.5);
     }
     .acc-text {
-      flex: 1; font-size: 0.88rem; font-weight: 600;
-      color: var(--text-main); line-height: 1.55;
+      flex: 1; font-size: 0.88rem; font-weight: 500;
+      color: var(--text); line-height: 1.5;
     }
     .acc-arrow {
-      color: var(--text-mute);
+      color: var(--muted2);
       transition: transform 0.22s ease, color 0.15s;
       flex-shrink: 0; display: flex; align-items: center;
     }
@@ -451,45 +473,53 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     }
 
     .acc-body {
-      padding: 1rem 1.1rem 1.1rem 3rem;
-      background: linear-gradient(180deg, var(--accent-light) 0%, var(--surface) 100%);
-      border-top: 1px solid var(--border-light);
-      font-size: 0.86rem; color: var(--text-sub); line-height: 1.9;
+      padding: 1rem 1.1rem 1.1rem 3.1rem;
+      background: var(--bg);
+      font-size: 0.85rem; color: var(--muted); line-height: 1.9;
     }
-    .acc-body p { margin-bottom: 0.5rem; }
+    .acc-body p { margin-bottom: 0.4rem; }
     .acc-body p:last-child { margin-bottom: 0; }
     .acc-tag {
       display: inline-flex; align-items: center;
-      margin-top: 0.6rem;
-      font-size: 0.72rem; font-weight: 600;
-      color: var(--accent); background: var(--accent-light);
-      border: 1px solid var(--accent-mid);
+      margin-top: 0.65rem;
+      font-size: 0.68rem; font-weight: 600;
+      color: var(--cyan);
+      background: rgba(0,229,255,0.08);
+      border: 1px solid rgba(0,229,255,0.2);
       padding: 2px 10px; border-radius: 4px;
+      letter-spacing: 0.5px;
     }
 
-    .empty { font-size: 0.84rem; color: var(--text-mute); padding: 0.75rem 0; font-style: italic; }
+    .empty {
+      font-size: 0.82rem; color: var(--muted2);
+      padding: 1.5rem 0; text-align: center;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-md);
+      letter-spacing: 2px;
+    }
 
-    /* ── Footer ── */
+    /* ══ FOOTER ══ */
     footer {
-      max-width: 1240px; margin: 0 auto 2rem;
+      max-width: 1240px; margin: 0 auto 2.5rem;
       padding: 1.5rem 1.5rem 0;
       border-top: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
     }
-    .footer-left  { font-size: 0.72rem; color: var(--text-mute); }
+    .footer-left { font-size: 0.72rem; color: var(--muted2); letter-spacing: 1px; }
     .footer-right {
-      font-size: 0.68rem; color: var(--text-mute);
-      background: var(--surface-2); border: 1px solid var(--border);
-      padding: 3px 12px; border-radius: 20px;
+      font-size: 0.65rem; color: var(--accent);
+      background: rgba(124,106,255,0.08);
+      border: 1px solid rgba(124,106,255,0.2);
+      padding: 3px 12px; border-radius: 20px; letter-spacing: 1px;
     }
 
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width: 5px; }
+    /* ══ SCROLLBAR ══ */
+    ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--text-mute); }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
 
-    /* ── Mobile ── */
+    /* ══ MOBILE ══ */
     @media (max-width: 768px) {
       header { padding: 0 1rem; height: 56px; }
       .header-divider, .header-tag { display: none; }
@@ -498,17 +528,18 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
         margin: 1rem auto; padding: 0 0.75rem; gap: 0.85rem;
       }
       .sidenav {
-        position: static; display: flex; flex-wrap: wrap; gap: 6px; padding: 0.75rem;
+        position: static;
+        display: flex; flex-wrap: wrap; gap: 6px; padding: 0.75rem;
       }
       .sidenav-title { width: 100%; margin-bottom: 0.2rem; }
       .nav-link {
         padding: 0.38rem 0.75rem;
-        background: var(--surface-2); border: 1px solid var(--border);
+        background: var(--bg2); border: 1px solid var(--border);
         border-radius: 20px; font-size: 0.78rem;
       }
       .section { padding: 1rem; }
       .insight-grid { grid-template-columns: 1fr; gap: 0.75rem; }
-      .acc-title { padding: 0.9rem 1rem; min-height: 52px; }
+      .acc-title { padding: 0.9rem 1rem; }
       .acc-body  { padding: 0.85rem 0.9rem 0.9rem 2.4rem; }
       footer {
         flex-direction: column; gap: 0.5rem;
@@ -522,6 +553,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     }
   `;
 
+  // ── 拼装 HTML ──
   return (
     '<!DOCTYPE html>\n' +
     '<html lang="zh-CN">\n' +
@@ -532,6 +564,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     '  <style>' + css + '</style>\n' +
     '</head>\n' +
     '<body>\n' +
+
     '<header>\n' +
     '  <div class="header-inner">\n' +
     '    <div class="brand">\n' +
@@ -551,6 +584,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     '    </div>\n' +
     '  </div>\n' +
     '</header>\n' +
+
     '<div class="layout">\n' +
     '  <nav class="sidenav">\n' +
     '    <div class="sidenav-title">栏目导航</div>\n' +
@@ -561,10 +595,12 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     '    ' + otherHTML + '\n' +
     '  </main>\n' +
     '</div>\n' +
+
     '<footer>\n' +
     '  <div class="footer-left">Joy 每日新闻播报 · ' + dateStr + ' · ' + weekDay + '</div>\n' +
     '  <div class="footer-right">Powered by Moonshot AI</div>\n' +
     '</footer>\n' +
+
     '</body>\n' +
     '</html>'
   );
