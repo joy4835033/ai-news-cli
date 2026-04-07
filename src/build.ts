@@ -35,12 +35,12 @@ function filterRecent(articles: Article[]): Article[] {
   return articles.filter(a => a.publishedAt.getTime() > cutoff);
 }
 
-// ── 序列化给 AI（只传必要字段，节省 token）─────────────
+// ── 序列化给 AI ───────────────────────────────────────
 function articlesToPromptJson(articles: Article[]): string {
   const simplified = articles.map((a, i) => ({
     id: i + 1,
     title: a.title,
-    summary: a.summary.slice(0, 200),   // 摘要最多200字
+    summary: a.summary.slice(0, 200),
     source: a.source,
     time: a.publishedAt.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
   }));
@@ -59,26 +59,26 @@ ${rawJson}
 {
   "cat1": {
     "highlights": [
-      { "title": "新闻标题", "summary": "1-2句中文摘要" }
+      { "title": "新闻标题", "summary": "50-100字的中文摘要，需包含事件背景、核心内容和影响，语言简洁专业" }
     ],
     "crossSector": "跨板块关联分析，100字以内",
     "startupAdvice": "创业方向建议，100字以内",
     "riskWarning": "风险预警，100字以内"
   },
   "cat2": [
-    { "title": "行业动态标题", "summary": "中文摘要", "company": "相关企业名" }
+    { "title": "行业动态标题", "summary": "50-100字的中文摘要，需包含事件背景、核心内容和影响，语言简洁专业", "company": "相关企业名" }
   ],
   "cat3": [
-    { "title": "投融资新闻标题", "summary": "中文摘要", "amount": "融资金额（如有）" }
+    { "title": "投融资新闻标题", "summary": "50-100字的中文摘要，需包含融资方、投资方、金额用途及行业意义", "amount": "融资金额（如有）" }
   ],
   "cat4": [
-    { "title": "技术突破标题", "summary": "中文摘要" }
+    { "title": "技术突破标题", "summary": "50-100字的中文摘要，需包含技术原理、突破点和应用前景" }
   ],
   "cat5": [
-    { "title": "产品上线标题", "summary": "中文摘要", "product": "产品名" }
+    { "title": "产品上线标题", "summary": "50-100字的中文摘要，需包含产品功能、目标用户和市场定位", "product": "产品名" }
   ],
   "cat6": [
-    { "title": "AI教育资讯标题", "summary": "中文摘要" }
+    { "title": "AI教育资讯标题", "summary": "50-100字的中文摘要，需包含内容特点、受众群体和教育价值" }
   ]
 }
 
@@ -91,6 +91,7 @@ ${rawJson}
 - cat6：AI教育、学习工具、在线课程、技能培训相关，选3-5条
 - 某类没有相关内容则返回空数组 []
 - 所有 title 和 summary 必须是中文
+- summary 字数严格控制在50-100字之间，不得少于50字
 - 不要编造原始新闻中没有的内容`;
 
   const response = await client.chat.completions.create({
@@ -110,11 +111,11 @@ function newsAccordion(items: any[], extraField?: string): string {
       <button class="acc-title" onclick="toggle(this)">
         <span class="acc-index">${String(i + 1).padStart(2, '0')}</span>
         <span class="acc-text">${item.title}</span>
-        <span class="acc-arrow">▸</span>
+        <span class="acc-arrow">›</span>
       </button>
       <div class="acc-body">
         <p>${item.summary || ''}</p>
-        ${extraField && item[extraField] ? `<p class="acc-tag">📌 ${item[extraField]}</p>` : ''}
+        ${extraField && item[extraField] ? `<span class="acc-tag">${item[extraField]}</span>` : ''}
       </div>
     </div>
   `).join('');
@@ -125,7 +126,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
   const data = JSON.parse(jsonStr);
 
   const cat1 = data.cat1 || {};
-  const highlights  = cat1.highlights || [];
+  const highlights = cat1.highlights || [];
   const cat2 = data.cat2 || [];
   const cat3 = data.cat3 || [];
   const cat4 = data.cat4 || [];
@@ -135,59 +136,55 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
   const cat1HTML = `
     <div class="section" id="sec-1">
       <div class="sec-header">
-        <span class="sec-icon">📋</span>
-        <h2>综合要闻</h2>
-        <span class="sec-count">今日收录 ${total} 篇</span>
+        <h2><span class="sec-icon">📋</span>综合要闻</h2>
+        <span class="sec-badge">${total} 篇</span>
       </div>
-
       <div class="sub-block">
-        <div class="sub-title">📰 今日新闻摘录</div>
+        <div class="sub-label">今日新闻摘录</div>
         ${newsAccordion(highlights)}
       </div>
-
-      <div class="sub-block">
-        <div class="sub-title">🔗 跨板块关联</div>
-        <div class="text-card">${cat1.crossSector || '暂无分析'}</div>
-      </div>
-
-      <div class="sub-block">
-        <div class="sub-title">🚀 创业方向建议</div>
-        <div class="text-card highlight-card">${cat1.startupAdvice || '暂无建议'}</div>
-      </div>
-
-      <div class="sub-block">
-        <div class="sub-title">⚠️ 风险预警</div>
-        <div class="text-card warning-card">${cat1.riskWarning || '暂无预警'}</div>
+      <div class="insight-grid">
+        <div class="insight-card">
+          <div class="insight-label">🔗 跨板块关联</div>
+          <div class="insight-text">${cat1.crossSector || '暂无分析'}</div>
+        </div>
+        <div class="insight-card accent-blue">
+          <div class="insight-label">🚀 创业方向建议</div>
+          <div class="insight-text">${cat1.startupAdvice || '暂无建议'}</div>
+        </div>
+        <div class="insight-card accent-amber">
+          <div class="insight-label">⚠️ 风险预警</div>
+          <div class="insight-text">${cat1.riskWarning || '暂无预警'}</div>
+        </div>
       </div>
     </div>
   `;
 
   const sections = [
-    { id: 2, icon: '🏭', title: '行业动态', items: cat2, extra: 'company' },
-    { id: 3, icon: '💰', title: '投资融资', items: cat3, extra: 'amount'  },
-    { id: 4, icon: '⚡', title: '技术突破', items: cat4                   },
-    { id: 5, icon: '📦', title: '产品上线', items: cat5, extra: 'product' },
-    { id: 6, icon: '🎓', title: 'AI 教育资讯', items: cat6               },
+    { id: 2, icon: '🏭', title: '行业动态',   items: cat2, extra: 'company' },
+    { id: 3, icon: '💰', title: '投资融资',   items: cat3, extra: 'amount'  },
+    { id: 4, icon: '⚡', title: '技术突破',   items: cat4                   },
+    { id: 5, icon: '📦', title: '产品上线',   items: cat5, extra: 'product' },
+    { id: 6, icon: '🎓', title: 'AI 教育资讯', items: cat6                  },
   ];
 
   const otherHTML = sections.map(s => `
     <div class="section" id="sec-${s.id}">
       <div class="sec-header">
-        <span class="sec-icon">${s.icon}</span>
-        <h2>${s.title}</h2>
-        <span class="sec-count">${s.items.length} 条</span>
+        <h2><span class="sec-icon">${s.icon}</span>${s.title}</h2>
+        <span class="sec-badge">${s.items.length} 条</span>
       </div>
       ${newsAccordion(s.items, s.extra)}
     </div>
   `).join('');
 
   const navItems = [
-    { id: 1, icon: '📋', label: '综合要闻'  },
-    { id: 2, icon: '🏭', label: '行业动态'  },
-    { id: 3, icon: '💰', label: '投资融资'  },
-    { id: 4, icon: '⚡', label: '技术突破'  },
-    { id: 5, icon: '📦', label: '产品上线'  },
-    { id: 6, icon: '🎓', label: 'AI 教育'   },
+    { id: 1, icon: '📋', label: '综合要闻'   },
+    { id: 2, icon: '🏭', label: '行业动态'   },
+    { id: 3, icon: '💰', label: '投资融资'   },
+    { id: 4, icon: '⚡', label: '技术突破'   },
+    { id: 5, icon: '📦', label: '产品上线'   },
+    { id: 6, icon: '🎓', label: 'AI 教育'    },
   ];
 
   const navHTML = navItems.map(n =>
@@ -202,141 +199,313 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
   <title>Joy 每日新闻播报 · ${dateStr}</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:   #1a3a5c;
+      --accent:    #2563eb;
+      --border:    #e2e8f0;
+      --bg:        #f4f6f9;
+      --surface:   #ffffff;
+      --text-main: #1e293b;
+      --text-sub:  #64748b;
+      --text-mute: #94a3b8;
+      --radius:    10px;
+    }
+
     body {
       font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f0f2f5; color: #1a1a2e; line-height: 1.75;
+      background: var(--bg);
+      color: var(--text-main);
+      line-height: 1.75;
+      font-size: 14px;
     }
 
-    /* Header */
+    /* ── Header ── */
     header {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-      padding: 1.2rem 2rem;
-      position: sticky; top: 0; z-index: 100;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      background: var(--primary);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 3px solid var(--accent);
     }
     .header-inner {
-      max-width: 1200px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .header-brand { display: flex; align-items: center; gap: 12px; }
-    .brand-logo {
-      width: 38px; height: 38px; border-radius: 9px;
-      background: linear-gradient(135deg, #e94560, #0f3460);
-      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .brand-name  { font-size: 1.15rem; font-weight: 700; color: #fff; letter-spacing: 1px; }
-    .brand-sub   { font-size: 0.72rem; color: #a0aec0; letter-spacing: 2px; margin-top: 2px; }
-    .header-date { text-align: right; }
-    .date-main   { font-size: 1rem; font-weight: 600; color: #e2e8f0; }
-    .date-week   { font-size: 0.78rem; color: #a0aec0; margin-top: 2px; }
+    .brand-mark {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .brand-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+    .brand-sub {
+      font-size: 0.68rem;
+      color: #93c5fd;
+      letter-spacing: 2px;
+      margin-top: 1px;
+    }
+    .header-date {
+      text-align: right;
+    }
+    .date-main { font-size: 0.9rem; font-weight: 600; color: #e2e8f0; }
+    .date-week { font-size: 0.72rem; color: #93c5fd; margin-top: 1px; }
 
-    /* Layout */
+    /* ── Layout ── */
     .layout {
-      max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem;
-      display: grid; grid-template-columns: 175px 1fr;
-      gap: 1.5rem; align-items: start;
+      max-width: 1200px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 1.5rem;
+      align-items: start;
     }
 
-    /* Sidenav */
+    /* ── Sidenav ── */
     .sidenav {
-      background: #fff; border-radius: 14px; padding: 1.2rem;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-      position: sticky; top: 80px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 0.75rem;
+      position: sticky;
+      top: 72px;
     }
     .sidenav-title {
-      font-size: 0.7rem; font-weight: 700; color: #a0aec0;
-      letter-spacing: 2px; text-transform: uppercase;
-      margin-bottom: 0.8rem; padding-bottom: 0.6rem;
-      border-bottom: 1px solid #f0f0f0;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-mute);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 0 0.4rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.5rem;
     }
     .nav-link {
-      display: block; padding: 0.5rem 0.7rem; border-radius: 8px;
-      font-size: 0.87rem; color: #4a5568; text-decoration: none;
-      transition: all 0.2s; margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0.45rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.83rem;
+      color: var(--text-sub);
+      text-decoration: none;
+      transition: all 0.15s;
+      margin-bottom: 2px;
     }
-    .nav-link:hover { background: #ebf4ff; color: #2b6cb0; }
+    .nav-link:hover {
+      background: #eff6ff;
+      color: var(--accent);
+    }
 
-    /* Section */
-    .main-content { display: flex; flex-direction: column; gap: 1.5rem; }
+    /* ── Section ── */
+    .main-content { display: flex; flex-direction: column; gap: 1.25rem; }
     .section {
-      background: #fff; border-radius: 14px; padding: 1.8rem 2rem;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.75rem;
     }
     .sec-header {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 1.4rem; padding-bottom: 0.8rem;
-      border-bottom: 2px solid #ebf4ff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
     }
-    .sec-icon  { font-size: 1.3rem; }
-    .sec-header h2 { font-size: 1.05rem; font-weight: 700; color: #1a1a2e; flex: 1; }
-    .sec-count { font-size: 0.75rem; color: #a0aec0; background: #f7fafc;
-                 padding: 2px 10px; border-radius: 20px; }
+    .sec-header h2 {
+      font-size: 0.97rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .sec-icon { font-size: 1rem; }
+    .sec-badge {
+      font-size: 0.7rem;
+      color: var(--text-mute);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
 
-    /* Sub block */
-    .sub-block { margin-bottom: 1.4rem; }
+    /* ── Sub label ── */
+    .sub-block { margin-bottom: 1.25rem; }
     .sub-block:last-child { margin-bottom: 0; }
-    .sub-title {
-      font-size: 0.84rem; font-weight: 700; color: #2d3748;
-      margin-bottom: 0.7rem; padding: 0.3rem 0.8rem;
-      background: #f7fafc; border-left: 3px solid #4299e1;
-      border-radius: 0 6px 6px 0;
+    .sub-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px dashed var(--border);
     }
 
-    /* Text cards */
-    .text-card {
-      background: #f7fafc; border-radius: 10px;
-      padding: 1rem 1.2rem; font-size: 0.92rem;
-      color: #4a5568; line-height: 1.8;
+    /* ── Insight grid ── */
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
     }
-    .highlight-card {
-      background: linear-gradient(135deg, #ebf8ff, #e6fffa);
-      border: 1px solid #bee3f8; color: #2c5282;
+    .insight-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      background: var(--bg);
     }
-    .warning-card {
-      background: linear-gradient(135deg, #fffaf0, #fff5f5);
-      border: 1px solid #fbd38d; color: #744210;
+    .insight-card.accent-blue {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+    }
+    .insight-card.accent-amber {
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+    .insight-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 0.5rem;
+    }
+    .insight-text {
+      font-size: 0.85rem;
+      color: var(--text-main);
+      line-height: 1.75;
     }
 
-    /* Accordion */
+    /* ── Accordion ── */
     .acc-item {
-      border: 1px solid #e8ecf0; border-radius: 10px;
-      margin-bottom: 8px; overflow: hidden; transition: box-shadow 0.2s;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      overflow: hidden;
     }
-    .acc-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
     .acc-title {
-      width: 100%; display: flex; align-items: center; gap: 10px;
-      padding: 0.85rem 1rem; background: #fafbfc;
-      border: none; cursor: pointer; text-align: left; transition: background 0.2s;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s;
     }
-    .acc-title:hover, .acc-title.open { background: #ebf4ff; }
-    .acc-index { font-size: 0.7rem; font-weight: 700; color: #a0aec0; letter-spacing: 1px; flex-shrink: 0; }
-    .acc-text  { flex: 1; font-size: 0.93rem; font-weight: 600; color: #2d3748; line-height: 1.5; }
-    .acc-arrow { font-size: 0.8rem; color: #a0aec0; transition: transform 0.25s; flex-shrink: 0; }
+    .acc-title:hover,
+    .acc-title.open {
+      background: #f8faff;
+    }
+    .acc-index {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: #eff6ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
+    }
+    .acc-text {
+      flex: 1;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+    .acc-arrow {
+      font-size: 1.1rem;
+      color: var(--text-mute);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+      line-height: 1;
+    }
     .acc-title.open .acc-arrow { transform: rotate(90deg); }
     .acc-body {
-      display: none; padding: 0.9rem 1rem 1rem 2.8rem;
-      background: #fff; border-top: 1px solid #e8ecf0;
-      font-size: 0.88rem; color: #718096; line-height: 1.8;
+      display: none;
+      padding: 0.85rem 1rem 0.9rem 2.6rem;
+      background: #fafbfd;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      line-height: 1.85;
     }
     .acc-body.open { display: block; }
-    .acc-tag { margin-top: 0.5rem; font-size: 0.82rem; color: #4299e1; font-weight: 600; }
-
-    .empty { font-size: 0.88rem; color: #a0aec0; padding: 0.5rem 0; }
-
-    footer {
-      text-align: center; padding: 2rem;
-      font-size: 0.78rem; color: #a0aec0; letter-spacing: 1px;
+    .acc-tag {
+      display: inline-block;
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: #eff6ff;
+      padding: 2px 8px;
+      border-radius: 4px;
     }
 
-    /* Mobile */
+    .empty {
+      font-size: 0.85rem;
+      color: var(--text-mute);
+      padding: 0.5rem 0;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.72rem;
+      color: var(--text-mute);
+      letter-spacing: 1px;
+      border-top: 1px solid var(--border);
+      margin-top: 1rem;
+    }
+
+    /* ── Mobile ── */
     @media (max-width: 768px) {
       .layout { grid-template-columns: 1fr; }
-      .sidenav { position: static; display: flex; flex-wrap: wrap; gap: 6px; padding: 1rem; }
+      .sidenav {
+        position: static;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 0.75rem;
+      }
       .sidenav-title { width: 100%; }
-      .nav-link { padding: 0.4rem 0.8rem; background: #f0f2f5; border-radius: 20px; font-size: 0.82rem; }
-      .section { padding: 1.2rem; }
-      .header-inner { flex-direction: column; gap: 8px; text-align: center; }
-      .header-date { text-align: center; }
+      .nav-link {
+        padding: 0.35rem 0.75rem;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        font-size: 0.78rem;
+      }
+      .section { padding: 1.1rem 1.2rem; }
+      .insight-grid { grid-template-columns: 1fr; }
+      header { padding: 0 1rem; }
+      .header-inner { gap: 8px; }
     }
   </style>
 </head>
@@ -344,8 +513,8 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
 
 <header>
   <div class="header-inner">
-    <div class="header-brand">
-      <div class="brand-logo">📡</div>
+    <div class="brand">
+      <div class="brand-mark">📡</div>
       <div>
         <div class="brand-name">Joy 每日新闻播报</div>
         <div class="brand-sub">AI · TECH · INSIGHT</div>
@@ -387,7 +556,6 @@ async function main() {
   const { dateStr, weekDay } = getBeijingDate();
   console.log(`📰 正在生成 ${dateStr} 日报...`);
 
-  // 1. 抓取原始新闻
   console.log('🌐 正在抓取新闻源...');
   const allArticles = await fetchAllSources(SOURCES);
   const recent = filterRecent(allArticles);
@@ -398,13 +566,11 @@ async function main() {
     process.exit(1);
   }
 
-  // 2. AI 分类整理
   console.log('🤖 正在调用 AI 分类整理...');
   const promptJson = articlesToPromptJson(recent);
   const jsonStr = await generateSections(promptJson, dateStr);
   console.log('✅ AI 整理完成');
 
-  // 3. 生成 HTML
   const html = buildHTML(jsonStr, dateStr, weekDay, recent.length);
   fs.mkdirSync('dist', { recursive: true });
   fs.writeFileSync(path.join('dist', 'index.html'), html, 'utf-8');
