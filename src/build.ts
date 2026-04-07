@@ -1,134 +1,280 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { marked } from 'marked';
+import * as fs from 'fs';
+import * as path from 'path';
+import OpenAI from 'openai';
 
-async function build(): Promise<void> {
-  const outputDir = path.resolve('output');
-  const publicDir = path.resolve('public');
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
-  await fs.mkdir(publicDir, { recursive: true });
-
-  // 读取所有日报
-  const files = await fs.readdir(outputDir);
-  const mdFiles = files
-    .filter(f => f.startsWith('ai-daily-') && f.endsWith('.md'))
-    .sort()
-    .reverse();
-
-  if (mdFiles.length === 0) {
-    console.log('⚠️  没有找到任何日报文件');
-    return;
-  }
-
-  // 生成归档链接
-  const archiveDates = mdFiles.map(f =>
-    f.replace('ai-daily-', '').replace('.md', '')
-  );
-
-  // 为每个日报生成一个 HTML 文件
-  for (const file of mdFiles) {
-    const date = file.replace('ai-daily-', '').replace('.md', '');
-    const md = await fs.readFile(path.join(outputDir, file), 'utf-8');
-    const body = await marked(md);
-    const html = buildHtml(body, date, archiveDates);
-
-    const outName = date === archiveDates[0] ? 'index.html' : `${date}.html`;
-    await fs.writeFile(path.join(publicDir, outName), html, 'utf-8');
-    console.log(`✅ 生成：public/${outName}`);
-  }
-
-  // 最新一篇也单独保存一份带日期名的文件（方便归档跳转）
-  const latestDate = archiveDates[0];
-  const latestMd = await fs.readFile(
-    path.join(outputDir, `ai-daily-${latestDate}.md`), 'utf-8'
-  );
-  const latestBody = await marked(latestMd);
-  const latestHtml = buildHtml(latestBody, latestDate, archiveDates);
-  await fs.writeFile(
-    path.join(publicDir, `${latestDate}.html`), latestHtml, 'utf-8'
-  );
-
-  console.log(`\n🎉 构建完成，共生成 ${mdFiles.length} 个页面`);
+function getDateStr(): string {
+  const now = new Date();
+  const beijing = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+  const y = beijing.getUTCFullYear();
+  const m = String(beijing.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(beijing.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
-function buildHtml(body: string, activeDate: string, archiveDates: string[]): string {
-  const archiveLinks = archiveDates
-    .map(d => {
-      const cls = d === activeDate ? 'archive-link active' : 'archive-link';
-      const href = d === archiveDates[0] ? '/' : `/${d}.html`;
-      return `<a href="${href}" class="${cls}">${d}</a>`;
-    })
-    .join('\n');
+function getWeekDay(): string {
+  const days = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+  const now = new Date();
+  const beijing = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+  return days[beijing.getUTCDay()];
+}
+
+async function generateNews(): Promise<string> {
+  const today = getDateStr();
+  const prompt = `你是一个AI科技日报编辑，请生成${today}的AI科技日报。
+
+要求：
+1. 包含5条今日最重要的AI/科技新闻
+2. 每条新闻包含：标题、1-2句摘要、重要程度（用🔴🟡🟢表示高中低）
+3. 最后加一句"今日洞察"，50字以内的行业观点
+4. 语言简洁专业，面向科技从业者
+5. 用JSON格式返回，结构如下：
+
+{
+  "news": [
+    {
+      "title": "新闻标题",
+      "summary": "新闻摘要",
+      "level": "🔴"
+    }
+  ],
+  "insight": "今日洞察内容"
+}`;
+
+  const response = await client.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [{ role: 'user', content: prompt }],
+    response_format: { type: 'json_object' },
+  });
+
+  return response.choices[0].message.content || '{}';
+}
+
+function buildHTML(jsonStr: string, dateStr: string, weekDay: string): string {
+  const data = JSON.parse(jsonStr);
+  const news = data.news || [];
+  const insight = data.insight || '';
+
+  const newsHTML = news.map((item: any, index: number) => `
+    <div class="news-card" style="animation-delay: ${index * 0.1}s">
+      <div class="news-header">
+        <span class="news-level">${item.level}</span>
+        <span class="news-index">NO.${String(index + 1).padStart(2, '0')}</span>
+      </div>
+      <h3 class="news-title">${item.title}</h3>
+      <p class="news-summary">${item.summary}</p>
+    </div>
+  `).join('');
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🤖 AI 新闻日报 · ${activeDate}</title>
+  <title>AI 科技日报 · ${dateStr}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-           background: #f5f5f5; color: #1a1a1a; line-height: 1.75; }
-    header { background: #fff; border-bottom: 1px solid #e5e5e5; padding: .9rem 2rem;
-             display: flex; align-items: center; gap: 1rem;
-             position: sticky; top: 0; z-index: 10; }
-    header h1 { font-size: 1.1rem; font-weight: 700; color: #0070f3; }
-    header span { font-size: .85rem; color: #888; }
-    .layout { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem;
-              display: grid; grid-template-columns: 1fr 220px;
-              gap: 2rem; align-items: start; }
-    .content { background: #fff; border-radius: 12px; padding: 2.5rem;
-               box-shadow: 0 1px 4px rgba(0,0,0,.06); }
-    .content h1 { font-size: 1.6rem; border-bottom: 3px solid #0070f3;
-                  padding-bottom: .6rem; margin-bottom: 1.5rem; }
-    .content h2 { font-size: 1.2rem; color: #0070f3; margin: 2.5rem 0 1rem;
-                  padding-bottom: .3rem; border-bottom: 1px solid #e8f0fe; }
-    .content h3 { font-size: 1rem; margin: 1.5rem 0 .4rem; }
-    .content h3 a { color: #1a1a1a; text-decoration: none; }
-    .content h3 a:hover { color: #0070f3; text-decoration: underline; }
-    .content blockquote { border-left: 4px solid #0070f3; padding: .6rem 1rem;
-                          background: #f0f7ff; border-radius: 0 8px 8px 0;
-                          color: #444; margin: .6rem 0 1rem; font-size: .95rem; }
-    .content ul { padding-left: 1.4rem; margin: .4rem 0; }
-    .content li { font-size: .9rem; color: #555; }
-    .content hr { border: none; border-top: 1px solid #eee; margin: 1.2rem 0; }
-    .content p { margin: .5rem 0; }
-    .content a { color: #0070f3; }
-    .sidebar { background: #fff; border-radius: 12px; padding: 1.5rem;
-               box-shadow: 0 1px 4px rgba(0,0,0,.06);
-               position: sticky; top: 70px; }
-    .sidebar h2 { font-size: .95rem; font-weight: 700; color: #888;
-                  text-transform: uppercase; letter-spacing: .05em; margin-bottom: 1rem; }
-    .archive-link { display: block; padding: .4rem .6rem; border-radius: 6px;
-                    font-size: .88rem; color: #444; text-decoration: none;
-                    transition: background .15s; }
-    .archive-link:hover { background: #f0f7ff; color: #0070f3; }
-    .archive-link.active { background: #0070f3; color: #fff; font-weight: 600; }
-    @media (max-width: 768px) {
-      .layout { grid-template-columns: 1fr; }
-      .sidebar { position: static; }
-      .content { padding: 1.5rem; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0c0e17;
+      color: #e8eaf0;
+      font-family: 'Noto Serif SC', 'PingFang SC', serif;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* 顶部 header */
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .header-label {
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: #7c6af7;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .header-title {
+      font-size: clamp(28px, 6vw, 48px);
+      font-weight: 700;
+      background: linear-gradient(135deg, #a78bfa, #60a5fa, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .header-date {
+      font-size: 14px;
+      color: #6b7280;
+      letter-spacing: 2px;
+    }
+
+    .divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, #7c6af7, #60a5fa);
+      margin: 24px auto;
+      border-radius: 2px;
+    }
+
+    /* 新闻卡片 */
+    .news-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .news-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .news-card:hover {
+      background: rgba(124,106,247,0.08);
+      border-color: rgba(124,106,247,0.3);
+      transform: translateY(-2px);
+    }
+
+    .news-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .news-level {
+      font-size: 18px;
+    }
+
+    .news-index {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: #4b5563;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .news-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #f1f5f9;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .news-summary {
+      font-size: 14px;
+      color: #9ca3af;
+      line-height: 1.8;
+    }
+
+    /* 今日洞察 */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,106,247,0.12), rgba(96,165,250,0.08));
+      border: 1px solid rgba(124,106,247,0.25);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 40px;
+    }
+
+    .insight-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: #7c6af7;
+      margin-bottom: 12px;
+    }
+
+    .insight-text {
+      font-size: 16px;
+      color: #c4b5fd;
+      line-height: 1.8;
+      font-style: italic;
+    }
+
+    /* 底部 */
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #374151;
+      letter-spacing: 1px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 24px 16px; }
+      .news-card { padding: 18px; }
+      .news-title { font-size: 15px; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>🤖 AI 新闻日报</h1>
-    <span>每天早上 8 点自动更新</span>
-  </header>
-  <div class="layout">
-    <main class="content">${body}</main>
-    <aside class="sidebar">
-      <h2>📅 历史归档</h2>
-      ${archiveLinks}
-    </aside>
+  <div class="container">
+
+    <div class="header">
+      <div class="header-label">INTELLIGENCE DAILY</div>
+      <h1 class="header-title">AI 科技日报</h1>
+      <div class="header-date">${dateStr} · ${weekDay}</div>
+      <div class="divider"></div>
+    </div>
+
+    <div class="news-list">
+      ${newsHTML}
+    </div>
+
+    <div class="insight-box">
+      <div class="insight-label">✦ 今日洞察</div>
+      <p class="insight-text">${insight}</p>
+    </div>
+
+    <div class="footer">
+      YANG'S LAB · AI EDUCATION · ${dateStr}
+    </div>
+
   </div>
 </body>
 </html>`;
 }
 
-build().catch(err => {
-  console.error('❌ 构建失败：', err);
-  process.exit(1);
-});
+async function main() {
+  const dateStr = getDateStr();
+  const weekDay = getWeekDay();
+
+  console.log(`📰 正在生成 ${dateStr} 日报...`);
+
+  const jsonStr = await generateNews();
+  console.log('✅ 内容生成完成');
+
+  const html = buildHTML(jsonStr, dateStr, weekDay);
+
+  if (!fs.existsSync('dist')) {
+    fs.mkdirSync('dist');
+  }
+
+  fs.writeFileSync(path.join('dist', 'index.html'), html, 'utf-8');
+  console.log('✅ 文件写入 dist/index.html');
+}
+
+main().catch(console.error);
