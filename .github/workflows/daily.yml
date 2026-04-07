@@ -21,11 +21,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install ts-node and typescript
+        run: npm install -g ts-node typescript
+
       - name: List files
         run: ls -la
 
       - name: Build
-        run: npx ts-node --skip-project build.ts
+        run: ts-node build.ts
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
