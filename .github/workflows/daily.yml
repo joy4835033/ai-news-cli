@@ -21,14 +21,17 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install ts-node and typescript
-        run: npm install -g ts-node typescript
+      - name: Install typescript
+        run: npm install -g typescript
 
       - name: List files
         run: ls -la
 
+      - name: Compile TypeScript
+        run: tsc build.ts --outDir dist_ts --esModuleInterop --resolveJsonModule --skipLibCheck
+
       - name: Build
-        run: ts-node $GITHUB_WORKSPACE/build.ts
+        run: node dist_ts/build.js
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
