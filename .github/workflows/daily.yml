@@ -32,9 +32,6 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      - name: Show output directory
-        run: ls -la && ls -la dist || echo "dist folder does not exist"
-
       - name: Upload to COS
         uses: TencentCloud/cos-action@v1
         with:
@@ -42,6 +39,6 @@ jobs:
           secret_key: ${{ secrets.COS_SECRET_KEY }}
           cos_bucket: dailynews-1419760006
           cos_region: ap-shanghai
-          local_path: dist
+          local_path: public
           remote_path: /
           clean: true
