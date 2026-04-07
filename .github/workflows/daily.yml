@@ -28,9 +28,12 @@ jobs:
         run: tsc
 
       - name: Build
-        run: node dist_ts/build.js
+        run: node dist_ts/build.js 2>&1
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Show output directory
+        run: ls -la
 
       - name: Upload to COS
         uses: TencentCloud/cos-action@v1
@@ -39,6 +42,6 @@ jobs:
           secret_key: ${{ secrets.COS_SECRET_KEY }}
           cos_bucket: dailynews-1419760006
           cos_region: ap-shanghai
-          local_path: public
+          local_path: dist
           remote_path: /
           clean: true
