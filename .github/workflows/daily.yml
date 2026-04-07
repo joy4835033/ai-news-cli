@@ -5,22 +5,21 @@ on:
     - cron: '0 0 * * *'
   workflow_dispatch:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   generate:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 配置 Node.js
+      - name: 配置 Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: 安装依赖
         run: npm install
@@ -37,4 +36,3 @@ jobs:
           git add output/
           git diff --staged --quiet || git commit -m "📰 AI日报 $(date +'%Y-%m-%d')"
           git push
-
