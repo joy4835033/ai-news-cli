@@ -42,6 +42,21 @@ jobs:
           rm -rf node_modules
           npm install
 
+      - name: Diagnose
+        run: |
+          echo "=== package.json ==="
+          cat package.json
+          echo ""
+          echo "=== node_modules/openai exists? ==="
+          ls node_modules/openai 2>&1 || echo "NOT FOUND"
+          echo ""
+          echo "=== node_modules top level ==="
+          ls node_modules | head -30
+          echo ""
+          echo "=== working directory ==="
+          pwd
+          ls -la
+
       - name: Build
         run: npx tsx src/build.ts
         env:
