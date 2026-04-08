@@ -21,14 +21,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install typescript and types
-        run: npm install -g typescript && npm install --save-dev @types/node && npm install openai
-
-      - name: Compile TypeScript
-        run: tsc
+      - name: Install openai
+        run: npm install openai
 
       - name: Build
-        run: node dist_ts/build.js
+        run: npx tsx src/build.ts
         env:
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
 
