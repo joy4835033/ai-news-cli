@@ -34,8 +34,8 @@ jobs:
 
       - name: Download history from COS
         run: |
-          mkdir -p dist
-          coscmd download -r --force / dist/ || true
+          mkdir -p output
+          coscmd download -r --force / output/ || true
 
       - name: Clean and reinstall dependencies
         run: |
@@ -63,4 +63,4 @@ jobs:
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
 
       - name: Upload to COS
-        run: coscmd upload -r dist/ /
+        run: coscmd upload -r output/ /
