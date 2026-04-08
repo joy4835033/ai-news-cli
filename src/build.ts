@@ -55,18 +55,16 @@ function filterRecent(articles: Article[]): Article[] {
 function scoreAndFilter(articles: Article[]): Article[] {
   const now = Date.now();
   const scored = articles.map(a => {
-    // 真实性：梯队越高分越高
     const truthScore = a.tier === 1 ? 1.0 : a.tier === 2 ? 0.7 : 0.4;
-    // 新鲜度：24h内线性衰减
     const ageHours = (now - a.publishedAt.getTime()) / (1000 * 60 * 60);
     const freshnessScore = Math.max(0, 1 - ageHours / 24);
     const score = truthScore * 0.5 + freshnessScore * 0.5;
     return { ...a, score };
   });
-  // 按分数排序，取前60条（控制 token 用量）
+  // ✅ 改为 30 条，避免 AI 输出超 token
   return scored
     .sort((a, b) => (b as any).score - (a as any).score)
-    .slice(0, 60);
+    .slice(0, 30);
 }
 
 // ── 序列化给 AI ───────────────────────────────────────
@@ -141,24 +139,20 @@ async function generateSections(rawJson: string, dateStr: string): Promise<strin
     model: 'moonshot-v1-32k',
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
+    max_tokens: 8000,  // ✅ 新增：给输出留足空间
   });
 
   return response.choices[0].message.content || '{}';
 }
 
 // ── 手风琴列表 HTML ───────────────────────────────────
-// 原文链接放在 acc-body 底部，折叠内不展示在外面
 function newsAccordion(items: any[], extraField?: string): string {
   if (!items.length) return '<div class="empty">· 暂无相关内容 ·</div>';
   return items.map((item, i) => {
     const idx = String(i + 1).padStart(2, '0');
-
-    // 额外标签（company / amount / product / direction）
     const extra = extraField && item[extraField]
       ? '<span class="acc-tag">' + item[extraField] + '</span>'
       : '';
-
-    // 原文链接：放在摘要下方，只在展开后可见
     const sourceLink = item.url
       ? '<a href="' + item.url + '" target="_blank" rel="noopener" class="acc-source-link">'
           + '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">'
@@ -167,7 +161,6 @@ function newsAccordion(items: any[], extraField?: string): string {
           + '查看原文'
         + '</a>'
       : '';
-
     return (
       '<details class="acc-item">' +
         '<summary class="acc-title">' +
@@ -204,7 +197,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
   const cat6 = data.cat6 || [];
   const cat7 = data.cat7 || [];
 
-  // ── 要点整理 section ──
   const cat1HTML =
     '<section class="section" id="sec-1">' +
       '<div class="sec-header">' +
@@ -234,7 +226,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       '</div>' +
     '</section>';
 
-  // ── 其他 sections ──
   const sections = [
     { id: 2, icon: '🏭', title: '行业动态',    items: cat2, extra: 'company'   },
     { id: 3, icon: '💰', title: '投资融资',    items: cat3, extra: 'amount'    },
@@ -257,7 +248,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     '</section>'
   ).join('');
 
-  // ── 导航 ──
   const navItems = [
     { id: 1, icon: '🔮', label: '要点整理' },
     { id: 2, icon: '🏭', label: '行业动态' },
@@ -275,7 +265,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     '</a>'
   ).join('');
 
-  // ── CSS ──
   const css = `
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
 
@@ -307,7 +296,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ══ HEADER ══ */
     header {
       background: rgba(10,10,15,0.95);
       backdrop-filter: blur(16px);
@@ -348,7 +336,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       padding: 3px 10px; border-radius: 20px; letter-spacing: 2px;
     }
 
-    /* ══ LAYOUT ══ */
     .layout {
       max-width: 1240px; margin: 1.75rem auto;
       padding: 0 1.5rem;
@@ -356,7 +343,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       gap: 1.5rem; align-items: start;
     }
 
-    /* ══ SIDENAV ══ */
     .sidenav {
       background: var(--card); border: 1px solid var(--border);
       border-radius: var(--radius-lg); padding: 1rem 0.75rem;
@@ -378,7 +364,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     .nav-link:hover { background: rgba(124,106,255,0.1); color: var(--accent); }
     .nav-icon { font-size: 0.9rem; flex-shrink: 0; }
 
-    /* ══ SECTIONS ══ */
     .main-content { display: flex; flex-direction: column; gap: 1.25rem; }
     .section {
       background: var(--card); border: 1px solid var(--border);
@@ -400,7 +385,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       padding: 3px 11px; border-radius: 20px; letter-spacing: 1px;
     }
 
-    /* ══ SUB LABEL ══ */
     .sub-block { margin-bottom: 1.3rem; }
     .sub-block:last-child { margin-bottom: 0; }
     .sub-label {
@@ -411,7 +395,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     }
     .sub-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-    /* ══ INSIGHT GRID ══ */
     .insight-grid {
       display: grid; grid-template-columns: repeat(3, 1fr);
       gap: 1rem; margin-top: 1.1rem;
@@ -432,7 +415,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     .dot-pink   { background: var(--pink);   box-shadow: 0 0 6px rgba(255,107,157,0.6); }
     .insight-text { font-size: 0.83rem; color: var(--muted); line-height: 1.85; }
 
-    /* ══ ACCORDION ══ */
     details.acc-item > summary { list-style: none; }
     details.acc-item > summary::-webkit-details-marker { display: none; }
 
@@ -477,7 +459,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     }
     details[open] > .acc-title .acc-arrow { transform: rotate(90deg); color: var(--accent); }
 
-    /* acc-body：摘要 + 底部工具栏 */
     .acc-body {
       padding: 1rem 1.1rem 1rem 3.1rem;
       background: var(--bg);
@@ -485,7 +466,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     }
     .acc-summary { margin-bottom: 0.75rem; }
 
-    /* 底部：标签 + 原文链接 同行排列 */
     .acc-footer {
       display: flex; align-items: center; gap: 8px;
       flex-wrap: wrap;
@@ -497,7 +477,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       padding: 2px 10px; border-radius: 4px; letter-spacing: 0.5px;
     }
 
-    /* 原文链接按钮 */
     .acc-source-link {
       display: inline-flex; align-items: center;
       font-size: 0.68rem; font-weight: 600;
@@ -518,7 +497,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       border-radius: var(--radius-md); letter-spacing: 2px;
     }
 
-    /* ══ FOOTER ══ */
     footer {
       max-width: 1240px; margin: 0 auto 2.5rem;
       padding: 1.5rem 1.5rem 0; border-top: 1px solid var(--border);
@@ -531,13 +509,11 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       padding: 3px 12px; border-radius: 20px; letter-spacing: 1px;
     }
 
-    /* ══ SCROLLBAR ══ */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
 
-    /* ══ MOBILE ══ */
     @media (max-width: 768px) {
       header { padding: 0 1rem; height: 56px; }
       .header-divider, .header-tag { display: none; }
@@ -645,7 +621,20 @@ async function main() {
   const jsonStr = await generateSections(promptJson, dateStr);
   console.log('✅ AI 整理完成');
 
-  const html = buildHTML(jsonStr, dateStr, weekDay, recent.length);
+  // ✅ JSON 截断保护：AI 输出不完整时自动修复
+  let safeJson = jsonStr;
+  try {
+    JSON.parse(jsonStr);
+  } catch {
+    console.warn('⚠️  AI 返回 JSON 不完整，尝试修复...');
+    const lastBrace = jsonStr.lastIndexOf('}');
+    safeJson = jsonStr.slice(0, lastBrace + 1);
+    const opens  = (safeJson.match(/{/g) || []).length;
+    const closes = (safeJson.match(/}/g) || []).length;
+    for (let i = 0; i < opens - closes; i++) safeJson += '}';
+  }
+
+  const html = buildHTML(safeJson, dateStr, weekDay, recent.length);
   fs.mkdirSync('dist', { recursive: true });
   fs.writeFileSync(path.join('dist', 'index.html'), html, 'utf-8');
   console.log('✅ 文件写入 dist/index.html 成功');
