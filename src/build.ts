@@ -9,10 +9,26 @@ const client = new OpenAI({
   baseURL: 'https://api.moonshot.cn/v1',
 });
 
+// ── 信源（分三梯队）────────────────────────────────────
 const SOURCES: RSSSource[] = [
-  { name: 'TechCrunch', url: 'https://techcrunch.com/feed/' },
-  { name: 'TheVerge',   url: 'https://www.theverge.com/rss/index.xml' },
-  { name: 'HackerNews', url: 'https://hnrss.org/frontpage' },
+  // 第一梯队：官方/一手信源
+  { name: 'OpenAI Blog',    url: 'https://openai.com/blog/rss.xml',                                          tier: 1 },
+  { name: 'Anthropic',      url: 'https://www.anthropic.com/rss.xml',                                        tier: 1 },
+  { name: 'Google AI Blog', url: 'https://blog.google/technology/ai/rss/',                                   tier: 1 },
+  { name: 'DeepMind',       url: 'https://deepmind.google/blog/rss.xml',                                     tier: 1 },
+  { name: 'Meta AI',        url: 'https://ai.meta.com/blog/rss/',                                            tier: 1 },
+
+  // 第二梯队：高质量媒体
+  { name: 'TechCrunch',     url: 'https://techcrunch.com/category/artificial-intelligence/feed/',            tier: 2 },
+  { name: 'TheVerge',       url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml',        tier: 2 },
+  { name: 'MIT Tech Review',url: 'https://www.technologyreview.com/feed/',                                   tier: 2 },
+  { name: 'VentureBeat AI', url: 'https://venturebeat.com/category/ai/feed/',                                tier: 2 },
+  { name: 'Wired AI',       url: 'https://www.wired.com/feed/tag/ai/latest/rss',                             tier: 2 },
+  { name: '机器之心',        url: 'https://www.jiqizhixin.com/rss',                                           tier: 2 },
+
+  // 第三梯队：补充信源
+  { name: 'HackerNews',     url: 'https://hnrss.org/frontpage',                                              tier: 3 },
+  { name: 'AI News',        url: 'https://artificialintelligence-news.com/feed/',                            tier: 3 },
 ];
 
 // ── 时间工具 ──────────────────────────────────────────
@@ -29,71 +45,97 @@ function getBeijingDate(): { dateStr: string; weekDay: string } {
   };
 }
 
-// ── 文章过滤：只保留24小时内 ──────────────────────────
+// ── 过滤24小时内 ──────────────────────────────────────
 function filterRecent(articles: Article[]): Article[] {
   const cutoff = Date.now() - 24 * 60 * 60 * 1000;
   return articles.filter(a => a.publishedAt.getTime() > cutoff);
 }
 
+// ── 评分筛选（真实性 × 新鲜度）────────────────────────
+function scoreAndFilter(articles: Article[]): Article[] {
+  const now = Date.now();
+  const scored = articles.map(a => {
+    // 真实性：梯队越高分越高
+    const truthScore = a.tier === 1 ? 1.0 : a.tier === 2 ? 0.7 : 0.4;
+    // 新鲜度：24h内线性衰减
+    const ageHours = (now - a.publishedAt.getTime()) / (1000 * 60 * 60);
+    const freshnessScore = Math.max(0, 1 - ageHours / 24);
+    const score = truthScore * 0.5 + freshnessScore * 0.5;
+    return { ...a, score };
+  });
+  // 按分数排序，取前60条（控制 token 用量）
+  return scored
+    .sort((a, b) => (b as any).score - (a as any).score)
+    .slice(0, 60);
+}
+
 // ── 序列化给 AI ───────────────────────────────────────
 function articlesToPromptJson(articles: Article[]): string {
   const simplified = articles.map((a, i) => ({
-    id: i + 1,
-    title: a.title,
+    id:      i + 1,
+    title:   a.title,
     summary: a.summary.slice(0, 300),
-    source: a.source,
-    time: a.publishedAt.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
+    source:  a.source,
+    tier:    a.tier,
+    url:     a.link,
+    time:    a.publishedAt.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
   }));
   return JSON.stringify(simplified, null, 2);
 }
 
 // ── 调用 AI 分类整理 ──────────────────────────────────
 async function generateSections(rawJson: string, dateStr: string): Promise<string> {
-  const prompt = '你是一位专业的AI科技日报主编，今天是' + dateStr + '。\n\n'
-    + '以下是今日抓取的原始新闻列表（JSON格式）：\n'
-    + rawJson + '\n\n'
-    + '请根据这些新闻生成结构化日报，严格按以下JSON格式返回，不要有任何多余内容。\n\n'
-    + '【重要】每条新闻的 summary 字段必须严格满足：\n'
-    + '1. 字数：80到120个中文字符，绝对不能少于80字\n'
-    + '2. 内容：第一句说明事件是什么，第二句说明背景或原因，第三句说明影响或意义\n'
-    + '3. 语言：简洁专业，不使用"该公司""此次"等模糊表达，直接说主语\n'
-    + '4. 禁止：不得只写一句话，不得少于三句话\n\n'
-    + '返回格式：\n'
-    + '{\n'
-    + '  "cat1": {\n'
-    + '    "highlights": [\n'
-    + '      { "title": "中文标题", "summary": "80-120字三句话摘要" }\n'
-    + '    ],\n'
-    + '    "crossSector": "跨板块关联分析100字以内",\n'
-    + '    "startupAdvice": "创业方向建议100字以内",\n'
-    + '    "riskWarning": "风险预警100字以内"\n'
-    + '  },\n'
-    + '  "cat2": [\n'
-    + '    { "title": "中文标题", "summary": "80-120字三句话摘要", "company": "企业名" }\n'
-    + '  ],\n'
-    + '  "cat3": [\n'
-    + '    { "title": "中文标题", "summary": "80-120字三句话摘要", "amount": "融资金额" }\n'
-    + '  ],\n'
-    + '  "cat4": [\n'
-    + '    { "title": "中文标题", "summary": "80-120字三句话摘要" }\n'
-    + '  ],\n'
-    + '  "cat5": [\n'
-    + '    { "title": "中文标题", "summary": "80-120字三句话摘要", "product": "产品名" }\n'
-    + '  ],\n'
-    + '  "cat6": [\n'
-    + '    { "title": "中文标题", "summary": "80-120字三句话摘要" }\n'
-    + '  ]\n'
-    + '}\n\n'
-    + '分类规则：\n'
-    + '- cat1.highlights：今日最重要3-5条，标题译成中文\n'
-    + '- cat2：OpenAI/Google/Meta/Microsoft/Anthropic等头部企业动态，3-5条\n'
-    + '- cat3：融资/投资/估值/收购新闻，3-5条\n'
-    + '- cat4：模型发布/算法突破/硬件革新，3-5条\n'
-    + '- cat5：新产品/功能上线/App发布/平台更新，3-5条\n'
-    + '- cat6：AI教育/学习工具/在线课程/技能培训，3-5条\n'
-    + '- 无相关内容返回空数组[]\n'
-    + '- 所有title和summary必须是中文\n'
-    + '- 不得编造原始新闻中没有的内容';
+  const prompt =
+    '你是一位专业的AI科技日报主编，今天是' + dateStr + '。\n\n'
+  + '以下是今日抓取的原始新闻列表（JSON格式），每条包含 tier 字段（1=官方一手，2=优质媒体，3=补充信源）：\n'
+  + rawJson + '\n\n'
+  + '请根据这些新闻生成结构化日报，严格按以下JSON格式返回，不要有任何多余内容。\n\n'
+  + '【重要】每条新闻的 summary 字段必须严格满足：\n'
+  + '1. 字数：80到120个中文字符，绝对不能少于80字\n'
+  + '2. 内容：第一句说明事件是什么，第二句说明背景或原因，第三句说明影响或意义\n'
+  + '3. 语言：简洁专业，不使用"该公司""此次"等模糊表达，直接说主语\n'
+  + '4. 禁止：不得只写一句话，不得少于三句话\n'
+  + '5. url 字段：直接复制原始新闻中对应的 url 值，不得修改或编造\n\n'
+  + '返回格式：\n'
+  + '{\n'
+  + '  "cat1": {\n'
+  + '    "highlights": [\n'
+  + '      { "title": "中文标题", "summary": "80-120字三句话摘要", "url": "原文链接" }\n'
+  + '    ],\n'
+  + '    "crossSector":    "跨板块关联分析100字以内",\n'
+  + '    "startupAdvice":  "创业方向建议100字以内",\n'
+  + '    "riskWarning":    "风险预警100字以内"\n'
+  + '  },\n'
+  + '  "cat2": [\n'
+  + '    { "title": "中文标题", "summary": "80-120字三句话摘要", "company": "企业名", "url": "原文链接" }\n'
+  + '  ],\n'
+  + '  "cat3": [\n'
+  + '    { "title": "中文标题", "summary": "80-120字三句话摘要", "amount": "融资金额", "url": "原文链接" }\n'
+  + '  ],\n'
+  + '  "cat4": [\n'
+  + '    { "title": "中文标题", "summary": "80-120字三句话摘要", "url": "原文链接" }\n'
+  + '  ],\n'
+  + '  "cat5": [\n'
+  + '    { "title": "中文标题", "summary": "80-120字三句话摘要", "product": "产品名", "url": "原文链接" }\n'
+  + '  ],\n'
+  + '  "cat6": [\n'
+  + '    { "title": "中文标题", "summary": "80-120字三句话摘要", "url": "原文链接" }\n'
+  + '  ],\n'
+  + '  "cat7": [\n'
+  + '    { "title": "机会标题", "summary": "80-120字机会拆解，说明适合人群、切入点、变现方式", "direction": "方向标签", "url": "原文链接" }\n'
+  + '  ]\n'
+  + '}\n\n'
+  + '分类规则：\n'
+  + '- cat1.highlights：今日最重要3-5条，优先选 tier=1 的内容，标题译成中文\n'
+  + '- cat2：OpenAI/Google/Meta/Microsoft/Anthropic等头部企业动态，3-5条\n'
+  + '- cat3：融资/投资/估值/收购新闻，3-5条\n'
+  + '- cat4：模型发布/算法突破/硬件革新，3-5条\n'
+  + '- cat5：新产品/功能上线/App发布/平台更新，3-5条\n'
+  + '- cat6：AI教育/学习工具/在线课程/技能培训，3-5条\n'
+  + '- cat7：从今日新闻中提炼3-5条适合普通人的AI副业或创业机会，给出具体方向标签\n'
+  + '- 无相关内容返回空数组[]\n'
+  + '- 所有 title 和 summary 必须是中文\n'
+  + '- 不得编造原始新闻中没有的内容';
 
   const response = await client.chat.completions.create({
     model: 'moonshot-v1-32k',
@@ -104,14 +146,28 @@ async function generateSections(rawJson: string, dateStr: string): Promise<strin
   return response.choices[0].message.content || '{}';
 }
 
-// ── 生成手风琴列表 HTML ───────────────────────────────
+// ── 手风琴列表 HTML ───────────────────────────────────
+// 原文链接放在 acc-body 底部，折叠内不展示在外面
 function newsAccordion(items: any[], extraField?: string): string {
   if (!items.length) return '<div class="empty">· 暂无相关内容 ·</div>';
   return items.map((item, i) => {
     const idx = String(i + 1).padStart(2, '0');
+
+    // 额外标签（company / amount / product / direction）
     const extra = extraField && item[extraField]
       ? '<span class="acc-tag">' + item[extraField] + '</span>'
       : '';
+
+    // 原文链接：放在摘要下方，只在展开后可见
+    const sourceLink = item.url
+      ? '<a href="' + item.url + '" target="_blank" rel="noopener" class="acc-source-link">'
+          + '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">'
+          + '<path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
+          + '</svg>'
+          + '查看原文'
+        + '</a>'
+      : '';
+
     return (
       '<details class="acc-item">' +
         '<summary class="acc-title">' +
@@ -124,15 +180,18 @@ function newsAccordion(items: any[], extraField?: string): string {
           '</span>' +
         '</summary>' +
         '<div class="acc-body">' +
-          '<p>' + (item.summary || '') + '</p>' +
-          extra +
+          '<p class="acc-summary">' + (item.summary || '') + '</p>' +
+          '<div class="acc-footer">' +
+            extra +
+            sourceLink +
+          '</div>' +
         '</div>' +
       '</details>'
     );
   }).join('');
 }
 
-// ── 拼装完整 HTML（深色科技风）────────────────────────
+// ── 拼装完整 HTML ─────────────────────────────────────
 function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: number): string {
   const data = JSON.parse(jsonStr);
 
@@ -143,14 +202,15 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
   const cat4 = data.cat4 || [];
   const cat5 = data.cat5 || [];
   const cat6 = data.cat6 || [];
+  const cat7 = data.cat7 || [];
 
-  // ── 综合要闻 section ──
+  // ── 要点整理 section ──
   const cat1HTML =
     '<section class="section" id="sec-1">' +
       '<div class="sec-header">' +
         '<div class="sec-header-left">' +
-          '<span class="sec-icon">📋</span>' +
-          '<h2>综合要闻</h2>' +
+          '<span class="sec-icon">🔮</span>' +
+          '<h2>要点整理</h2>' +
         '</div>' +
         '<span class="sec-badge">今日收录 ' + total + ' 篇</span>' +
       '</div>' +
@@ -161,7 +221,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       '<div class="insight-grid">' +
         '<div class="insight-card">' +
           '<div class="insight-label"><span class="insight-dot dot-purple"></span>跨板块关联</div>' +
-          '<div class="insight-text">' + (cat1.crossSector || '暂无分析') + '</div>' +
+          '<div class="insight-text">' + (cat1.crossSector   || '暂无分析') + '</div>' +
         '</div>' +
         '<div class="insight-card accent-cyan">' +
           '<div class="insight-label"><span class="insight-dot dot-cyan"></span>创业方向建议</div>' +
@@ -169,18 +229,19 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
         '</div>' +
         '<div class="insight-card accent-pink">' +
           '<div class="insight-label"><span class="insight-dot dot-pink"></span>风险预警</div>' +
-          '<div class="insight-text">' + (cat1.riskWarning || '暂无预警') + '</div>' +
+          '<div class="insight-text">' + (cat1.riskWarning   || '暂无预警') + '</div>' +
         '</div>' +
       '</div>' +
     '</section>';
 
-  // ── 其他 section ──
+  // ── 其他 sections ──
   const sections = [
-    { id: 2, icon: '🏭', title: '行业动态',    items: cat2, extra: 'company' },
-    { id: 3, icon: '💰', title: '投资融资',    items: cat3, extra: 'amount'  },
-    { id: 4, icon: '⚡', title: '技术突破',    items: cat4, extra: ''        },
-    { id: 5, icon: '📦', title: '产品上线',    items: cat5, extra: 'product' },
-    { id: 6, icon: '🎓', title: 'AI 教育资讯', items: cat6, extra: ''        },
+    { id: 2, icon: '🏭', title: '行业动态',    items: cat2, extra: 'company'   },
+    { id: 3, icon: '💰', title: '投资融资',    items: cat3, extra: 'amount'    },
+    { id: 4, icon: '⚡', title: '技术突破',    items: cat4, extra: ''          },
+    { id: 5, icon: '📦', title: '产品上线',    items: cat5, extra: 'product'   },
+    { id: 6, icon: '🎓', title: 'AI 教育资讯', items: cat6, extra: ''          },
+    { id: 7, icon: '🚀', title: '创业机会',    items: cat7, extra: 'direction' },
   ];
 
   const otherHTML = sections.map(s =>
@@ -198,12 +259,13 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
 
   // ── 导航 ──
   const navItems = [
-    { id: 1, icon: '📋', label: '综合要闻' },
+    { id: 1, icon: '🔮', label: '要点整理' },
     { id: 2, icon: '🏭', label: '行业动态' },
     { id: 3, icon: '💰', label: '投资融资' },
     { id: 4, icon: '⚡', label: '技术突破' },
     { id: 5, icon: '📦', label: '产品上线' },
     { id: 6, icon: '🎓', label: 'AI 教育'  },
+    { id: 7, icon: '🚀', label: '创业机会' },
   ];
 
   const navHTML = navItems.map(n =>
@@ -213,7 +275,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     '</a>'
   ).join('');
 
-  // ── CSS（深色科技风）──
+  // ── CSS ──
   const css = `
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
 
@@ -251,18 +313,12 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
       height: 64px;
-      display: flex;
-      align-items: center;
-      padding: 0 2rem;
-      position: sticky;
-      top: 0;
-      z-index: 200;
+      display: flex; align-items: center; padding: 0 2rem;
+      position: sticky; top: 0; z-index: 200;
     }
     header::after {
       content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 1px;
+      position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
       background: linear-gradient(90deg, transparent, var(--accent), var(--cyan), var(--accent), transparent);
     }
     .header-inner {
@@ -279,14 +335,8 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       box-shadow: 0 0 16px rgba(124,106,255,0.4);
       flex-shrink: 0;
     }
-    .brand-name {
-      font-size: 1rem; font-weight: 700; color: var(--text);
-      letter-spacing: 0.3px;
-    }
-    .brand-sub {
-      font-size: 0.62rem; color: var(--muted);
-      letter-spacing: 3px; margin-top: 2px;
-    }
+    .brand-name { font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: 0.3px; }
+    .brand-sub  { font-size: 0.62rem; color: var(--muted); letter-spacing: 3px; margin-top: 2px; }
     .header-right { display: flex; align-items: center; gap: 1.5rem; }
     .header-date-block { text-align: right; }
     .date-main { font-size: 0.88rem; font-weight: 600; color: var(--text); font-family: 'Space Grotesk', monospace; }
@@ -294,8 +344,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     .header-divider { width: 1px; height: 28px; background: var(--border2); }
     .header-tag {
       font-size: 0.65rem; font-weight: 600; color: var(--cyan);
-      border: 1px solid rgba(0,229,255,0.3);
-      background: rgba(0,229,255,0.06);
+      border: 1px solid rgba(0,229,255,0.3); background: rgba(0,229,255,0.06);
       padding: 3px 10px; border-radius: 20px; letter-spacing: 2px;
     }
 
@@ -303,53 +352,40 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     .layout {
       max-width: 1240px; margin: 1.75rem auto;
       padding: 0 1.5rem;
-      display: grid;
-      grid-template-columns: 172px 1fr;
-      gap: 1.5rem;
-      align-items: start;
+      display: grid; grid-template-columns: 172px 1fr;
+      gap: 1.5rem; align-items: start;
     }
 
     /* ══ SIDENAV ══ */
     .sidenav {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1rem 0.75rem;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1rem 0.75rem;
       position: sticky; top: 76px;
     }
     .sidenav-title {
       font-size: 0.6rem; font-weight: 700; color: var(--muted2);
       letter-spacing: 3px; text-transform: uppercase;
       padding: 0 0.5rem 0.65rem;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border); margin-bottom: 0.6rem;
     }
     .nav-link {
       display: flex; align-items: center; gap: 8px;
-      padding: 0.5rem 0.65rem;
-      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.65rem; border-radius: var(--radius-sm);
       font-size: 0.82rem; font-weight: 500;
       color: var(--muted); text-decoration: none;
       transition: all 0.15s ease; margin-bottom: 2px;
     }
-    .nav-link:hover {
-      background: rgba(124,106,255,0.1);
-      color: var(--accent);
-    }
+    .nav-link:hover { background: rgba(124,106,255,0.1); color: var(--accent); }
     .nav-icon { font-size: 0.9rem; flex-shrink: 0; }
 
     /* ══ SECTIONS ══ */
     .main-content { display: flex; flex-direction: column; gap: 1.25rem; }
-
     .section {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1.6rem 1.8rem;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1.6rem 1.8rem;
       transition: border-color 0.2s;
     }
     .section:hover { border-color: var(--border2); }
-
     .sec-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 1.3rem; padding-bottom: 0.9rem;
@@ -357,10 +393,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     }
     .sec-header-left { display: flex; align-items: center; gap: 9px; }
     .sec-icon { font-size: 1.05rem; }
-    .sec-header h2 {
-      font-size: 0.95rem; font-weight: 700; color: var(--text);
-      letter-spacing: 0.5px;
-    }
+    .sec-header h2 { font-size: 0.95rem; font-weight: 700; color: var(--text); letter-spacing: 0.5px; }
     .sec-badge {
       font-size: 0.65rem; font-weight: 600; color: var(--muted);
       background: var(--bg2); border: 1px solid var(--border);
@@ -376,10 +409,7 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       margin-bottom: 0.8rem;
       display: flex; align-items: center; gap: 8px;
     }
-    .sub-label::after {
-      content: ''; flex: 1; height: 1px;
-      background: var(--border);
-    }
+    .sub-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
     /* ══ INSIGHT GRID ══ */
     .insight-grid {
@@ -387,24 +417,14 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       gap: 1rem; margin-top: 1.1rem;
     }
     .insight-card {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 1.1rem 1.2rem;
-      background: var(--bg2);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 1.1rem 1.2rem; background: var(--bg2);
     }
-    .insight-card.accent-cyan {
-      background: rgba(0,229,255,0.04);
-      border-color: rgba(0,229,255,0.2);
-    }
-    .insight-card.accent-pink {
-      background: rgba(255,107,157,0.04);
-      border-color: rgba(255,107,157,0.2);
-    }
+    .insight-card.accent-cyan  { background: rgba(0,229,255,0.04);  border-color: rgba(0,229,255,0.2); }
+    .insight-card.accent-pink  { background: rgba(255,107,157,0.04); border-color: rgba(255,107,157,0.2); }
     .insight-label {
       font-size: 0.68rem; font-weight: 700; color: var(--muted);
-      margin-bottom: 0.6rem;
-      display: flex; align-items: center; gap: 6px;
-      letter-spacing: 1px;
+      margin-bottom: 0.6rem; display: flex; align-items: center; gap: 6px; letter-spacing: 1px;
     }
     .insight-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .dot-purple { background: var(--accent); box-shadow: 0 0 6px rgba(124,106,255,0.6); }
@@ -417,24 +437,18 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     details.acc-item > summary::-webkit-details-marker { display: none; }
 
     .acc-item {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      margin-bottom: 6px;
-      overflow: hidden;
-      transition: border-color 0.15s;
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      margin-bottom: 6px; overflow: hidden; transition: border-color 0.15s;
     }
     .acc-item:last-child { margin-bottom: 0; }
     .acc-item:hover { border-color: var(--accent); }
 
     .acc-title {
       display: flex; align-items: center; gap: 12px;
-      padding: 0.85rem 1.1rem;
-      background: var(--bg2);
-      cursor: pointer;
-      user-select: none;
+      padding: 0.85rem 1.1rem; background: var(--bg2);
+      cursor: pointer; user-select: none;
       -webkit-tap-highlight-color: transparent;
-      transition: background 0.15s;
-      width: 100%;
+      transition: background 0.15s; width: 100%;
     }
     .acc-title:hover { background: rgba(124,106,255,0.06); }
     details[open] > .acc-title {
@@ -443,19 +457,14 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     }
 
     .acc-index {
-      font-size: 0.6rem; font-weight: 700;
-      color: var(--accent);
-      background: rgba(124,106,255,0.12);
-      border: 1px solid rgba(124,106,255,0.25);
+      font-size: 0.6rem; font-weight: 700; color: var(--accent);
+      background: rgba(124,106,255,0.12); border: 1px solid rgba(124,106,255,0.25);
       padding: 2px 7px; border-radius: 4px;
       flex-shrink: 0; min-width: 28px; text-align: center;
-      font-family: 'Space Grotesk', monospace;
-      transition: all 0.15s;
+      font-family: 'Space Grotesk', monospace; transition: all 0.15s;
     }
     details[open] > .acc-title .acc-index {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
+      background: var(--accent); color: #fff; border-color: var(--accent);
       box-shadow: 0 0 8px rgba(124,106,255,0.5);
     }
     .acc-text {
@@ -463,53 +472,62 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
       color: var(--text); line-height: 1.5;
     }
     .acc-arrow {
-      color: var(--muted2);
-      transition: transform 0.22s ease, color 0.15s;
+      color: var(--muted2); transition: transform 0.22s ease, color 0.15s;
       flex-shrink: 0; display: flex; align-items: center;
     }
-    details[open] > .acc-title .acc-arrow {
-      transform: rotate(90deg);
-      color: var(--accent);
-    }
+    details[open] > .acc-title .acc-arrow { transform: rotate(90deg); color: var(--accent); }
 
+    /* acc-body：摘要 + 底部工具栏 */
     .acc-body {
-      padding: 1rem 1.1rem 1.1rem 3.1rem;
+      padding: 1rem 1.1rem 1rem 3.1rem;
       background: var(--bg);
       font-size: 0.85rem; color: var(--muted); line-height: 1.9;
     }
-    .acc-body p { margin-bottom: 0.4rem; }
-    .acc-body p:last-child { margin-bottom: 0; }
+    .acc-summary { margin-bottom: 0.75rem; }
+
+    /* 底部：标签 + 原文链接 同行排列 */
+    .acc-footer {
+      display: flex; align-items: center; gap: 8px;
+      flex-wrap: wrap;
+    }
     .acc-tag {
       display: inline-flex; align-items: center;
-      margin-top: 0.65rem;
+      font-size: 0.68rem; font-weight: 600; color: var(--cyan);
+      background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2);
+      padding: 2px 10px; border-radius: 4px; letter-spacing: 0.5px;
+    }
+
+    /* 原文链接按钮 */
+    .acc-source-link {
+      display: inline-flex; align-items: center;
       font-size: 0.68rem; font-weight: 600;
-      color: var(--cyan);
-      background: rgba(0,229,255,0.08);
-      border: 1px solid rgba(0,229,255,0.2);
+      color: var(--muted); text-decoration: none;
+      background: var(--bg2); border: 1px solid var(--border2);
       padding: 2px 10px; border-radius: 4px;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
       letter-spacing: 0.5px;
+    }
+    .acc-source-link:hover {
+      color: var(--accent); border-color: rgba(124,106,255,0.4);
+      background: rgba(124,106,255,0.08);
     }
 
     .empty {
-      font-size: 0.82rem; color: var(--muted2);
-      padding: 1.5rem 0; text-align: center;
-      border: 1px dashed var(--border);
-      border-radius: var(--radius-md);
-      letter-spacing: 2px;
+      font-size: 0.82rem; color: var(--muted2); padding: 1.5rem 0;
+      text-align: center; border: 1px dashed var(--border);
+      border-radius: var(--radius-md); letter-spacing: 2px;
     }
 
     /* ══ FOOTER ══ */
     footer {
       max-width: 1240px; margin: 0 auto 2.5rem;
-      padding: 1.5rem 1.5rem 0;
-      border-top: 1px solid var(--border);
+      padding: 1.5rem 1.5rem 0; border-top: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
     }
-    .footer-left { font-size: 0.72rem; color: var(--muted2); letter-spacing: 1px; }
+    .footer-left  { font-size: 0.72rem; color: var(--muted2); letter-spacing: 1px; }
     .footer-right {
       font-size: 0.65rem; color: var(--accent);
-      background: rgba(124,106,255,0.08);
-      border: 1px solid rgba(124,106,255,0.2);
+      background: rgba(124,106,255,0.08); border: 1px solid rgba(124,106,255,0.2);
       padding: 3px 12px; border-radius: 20px; letter-spacing: 1px;
     }
 
@@ -528,14 +546,12 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
         margin: 1rem auto; padding: 0 0.75rem; gap: 0.85rem;
       }
       .sidenav {
-        position: static;
-        display: flex; flex-wrap: wrap; gap: 6px; padding: 0.75rem;
+        position: static; display: flex; flex-wrap: wrap; gap: 6px; padding: 0.75rem;
       }
       .sidenav-title { width: 100%; margin-bottom: 0.2rem; }
       .nav-link {
-        padding: 0.38rem 0.75rem;
-        background: var(--bg2); border: 1px solid var(--border);
-        border-radius: 20px; font-size: 0.78rem;
+        padding: 0.38rem 0.75rem; background: var(--bg2);
+        border: 1px solid var(--border); border-radius: 20px; font-size: 0.78rem;
       }
       .section { padding: 1rem; }
       .insight-grid { grid-template-columns: 1fr; gap: 0.75rem; }
@@ -553,7 +569,6 @@ function buildHTML(jsonStr: string, dateStr: string, weekDay: string, total: num
     }
   `;
 
-  // ── 拼装 HTML ──
   return (
     '<!DOCTYPE html>\n' +
     '<html lang="zh-CN">\n' +
@@ -621,8 +636,12 @@ async function main() {
     process.exit(1);
   }
 
+  console.log('📊 正在评分筛选...');
+  const filtered = scoreAndFilter(recent);
+  console.log('✅ 筛选完成，送入 AI 处理：' + filtered.length + ' 篇');
+
   console.log('🤖 正在调用 AI 分类整理...');
-  const promptJson = articlesToPromptJson(recent);
+  const promptJson = articlesToPromptJson(filtered);
   const jsonStr = await generateSections(promptJson, dateStr);
   console.log('✅ AI 整理完成');
 
