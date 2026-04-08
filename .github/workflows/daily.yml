@@ -18,9 +18,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
-        run: npm install
-
       - name: Install coscmd
         run: pip install coscmd
 
@@ -40,11 +37,13 @@ jobs:
           mkdir -p dist
           coscmd download -r --force / dist/ || true
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Build
         run: npx tsx src/build.ts
         env:
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
 
       - name: Upload to COS
-        run: |
-          coscmd upload -r dist/ /
+        run: coscmd upload -r dist/ /
