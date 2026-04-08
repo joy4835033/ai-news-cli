@@ -288,7 +288,7 @@ function buildIndexHTML(dates: { dateStr: string; weekDay: string }[]): string {
   const cardHTML = dates.map((item, i) => {
     const isLatest = i === 0;
     return `
-    <a href="./${item.dateStr}/" class="date-card ${isLatest ? 'date-card-latest' : ''}">
+<a href="./${item.dateStr}/index.html" class="date-card ${isLatest ? 'date-card-latest' : ''}">
       <div class="date-card-left">
         <div class="date-card-day">${item.dateStr.slice(8)}</div>
         <div class="date-card-month">${item.dateStr.slice(0, 7)}</div>
