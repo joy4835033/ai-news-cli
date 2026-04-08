@@ -36,7 +36,9 @@ jobs:
           COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
 
       - name: Download history from COS
-        run: coscmd download -r / dist/ --ignore "dist/" || true
+        run: |
+          mkdir -p dist
+          coscmd download -r --force / dist/ || true
 
       - name: Build
         run: npx tsx src/build.ts
@@ -45,5 +47,4 @@ jobs:
 
       - name: Upload to COS
         run: |
-          coscmd upload -r dist/ / \
-            -H '{"Content-Type":"text/html; charset=utf-8"}'
+          coscmd upload -r dist/ /
