@@ -12,7 +12,8 @@ export function cleanText(raw: string | undefined): string {
     .trim();
 }
 
-function parseItem(item: any, source: RSSSource['name']): Article | null {
+// tier 从 source 透传进来
+function parseItem(item: any, source: RSSSource['name'], tier: RSSSource['tier']): Article | null {
   try {
     const title = item.title?.['#text'] ?? item.title ?? '';
     const link =
@@ -43,6 +44,7 @@ function parseItem(item: any, source: RSSSource['name']): Article | null {
       source,
       summary:        cleanText(String(rawDescription)),
       rawDescription: String(rawDescription),
+      tier,           // 新增
     };
   } catch {
     return null;
@@ -67,7 +69,7 @@ async function fetchSource(source: RSSSource): Promise<Article[]> {
     const items = Array.isArray(rawItems) ? rawItems : [rawItems];
 
     return items
-      .map(item => parseItem(item, source.name))
+      .map(item => parseItem(item, source.name, source.tier))  // 传入 tier
       .filter((a): a is Article => a !== null);
   } catch (err: any) {
     const reason = err?.name === 'AbortError' ? '请求超时' : err?.message;
