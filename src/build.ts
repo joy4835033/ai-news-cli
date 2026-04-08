@@ -234,7 +234,7 @@ function buildDailyHTML(jsonStr: string, dateStr: string, weekDay: string, total
 <header>
   <div class="header-inner">
     <div class="brand">
-      <a href="/" class="back-btn">
+      <a href="../" class="back-btn">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -288,7 +288,7 @@ function buildIndexHTML(dates: { dateStr: string; weekDay: string }[]): string {
   const cardHTML = dates.map((item, i) => {
     const isLatest = i === 0;
     return `
-    <a href="/${item.dateStr}/" class="date-card ${isLatest ? 'date-card-latest' : ''}">
+    <a href="./${item.dateStr}/" class="date-card ${isLatest ? 'date-card-latest' : ''}">
       <div class="date-card-left">
         <div class="date-card-day">${item.dateStr.slice(8)}</div>
         <div class="date-card-month">${item.dateStr.slice(0, 7)}</div>
@@ -413,13 +413,13 @@ function buildIndexHTML(dates: { dateStr: string; weekDay: string }[]): string {
 
 // ── 扫描历史日期目录 ──────────────────────────────────
 function scanHistoryDates(): { dateStr: string; weekDay: string }[] {
-  const distDir = 'dist';
-  if (!fs.existsSync(distDir)) return [];
+  const outputDir = 'output';
+  if (!fs.existsSync(outputDir)) return [];
   const weekDayMap: Record<string, string> = {
     '0': '星期日', '1': '星期一', '2': '星期二', '3': '星期三',
     '4': '星期四', '5': '星期五', '6': '星期六',
   };
-  return fs.readdirSync(distDir)
+  return fs.readdirSync(outputDir)
     .filter(name => /^\d{4}-\d{2}-\d{2}$/.test(name))
     .sort((a, b) => b.localeCompare(a))
     .map(dateStr => {
@@ -673,17 +673,17 @@ async function main() {
   }
 
   // 写入今日日报
-  const dailyDir = path.join('dist', dateStr);
+  const dailyDir = path.join('output', dateStr);
   fs.mkdirSync(dailyDir, { recursive: true });
   const dailyHTML = buildDailyHTML(safeJson, dateStr, weekDay, recent.length);
   fs.writeFileSync(path.join(dailyDir, 'index.html'), dailyHTML, 'utf-8');
-  console.log('✅ 日报写入 dist/' + dateStr + '/index.html');
+  console.log('✅ 日报写入 output/' + dateStr + '/index.html');
 
   // 扫描所有历史日期，生成首页
   const allDates = scanHistoryDates();
   const indexHTML = buildIndexHTML(allDates);
-  fs.writeFileSync(path.join('dist', 'index.html'), indexHTML, 'utf-8');
-  console.log('✅ 首页写入 dist/index.html，共 ' + allDates.length + ' 期');
+  fs.writeFileSync(path.join('output', 'index.html'), indexHTML, 'utf-8');
+  console.log('✅ 首页写入 output/index.html，共 ' + allDates.length + ' 期');
 }
 
 main().catch(err => {
