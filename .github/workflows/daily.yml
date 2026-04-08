@@ -37,8 +37,10 @@ jobs:
           mkdir -p dist
           coscmd download -r --force / dist/ || true
 
-      - name: Install dependencies
-        run: npm install
+      - name: Clean and reinstall dependencies
+        run: |
+          rm -rf node_modules
+          npm install
 
       - name: Build
         run: npx tsx src/build.ts
