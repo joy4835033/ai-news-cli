@@ -1,86 +1,94 @@
-import { XMLParser } from 'fast-xml-parser';
-import { Article, RSSSource } from './types.js';
+ import { promises as fs } from 'fs';
+import path from 'path';
+import { Article, SourceName } from './types.js';
 
-const parser = new XMLParser({ ignoreAttributes: false });
-
-export function cleanText(raw: string | undefined): string {
-  if (!raw) return '';
-  return raw
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&[a-z]+;/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+function formatTime(date: Date): string {
+  return date.toLocaleString('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit',
+  });
 }
 
-// tier 从 source 透传进来
-function parseItem(item: any, source: RSSSource['name'], tier: RSSSource['tier']): Article | null {
-  try {
-    const title = item.title?.['#text'] ?? item.title ?? '';
-    const link =
-      item.link?.['@_href'] ??
-      item.link ??
-      item.guid?.['#text'] ??
-      item.guid ??
-      '';
-    const pubRaw =
-      item.pubDate ??
-      item.published ??
-      item.updated ??
-      '';
-    const publishedAt = new Date(pubRaw);
-    if (isNaN(publishedAt.getTime())) return null;
+function buildStats(articles: Article[]): string {
+  const sourceCount = new Set(articles.map(a => a.source)).size;
+  const bySource = articles.reduce<Record<string, number>>((acc, a) => {
+    acc[a.source] = (acc[a.source] ?? 0) + 1;
+    return acc;
+  }, {});
 
-    const rawDescription =
-      item.description ??
-      item['content:encoded'] ??
-      item.summary ??
-      item.content?.['#text'] ??
-      '';
+  const breakdown = Object.entries(bySource)
+    .map(([src, count]) => `${src} ${count} 篇`)
+    .join(' · ');
 
-    return {
-      title:          String(title).trim(),
-      link:           String(link).trim(),
-      publishedAt,
-      source,
-      summary:        cleanText(String(rawDescription)),
-      rawDescription: String(rawDescription),
-      tier,           // 新增
-    };
-  } catch {
-    return null;
-  }
+  return [
+    '## 📊 今日统计',
+    '',
+    `- 📰 **共收录 ${articles.length} 篇**文章，来自 **${sourceCount} 个**信息源`,
+    `- 📌 来源分布：${breakdown}`,
+    `- 🕐 统计周期：过去 24 小时`,
+    '',
+  ].join('\n');
 }
 
-async function fetchSource(source: RSSSource): Promise<Article[]> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8000);
-
-  try {
-    const res = await fetch(source.url, {
-      signal: controller.signal,
-      headers: { 'User-Agent': 'ai-news-cli/1.0' },
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const xml = await res.text();
-    const parsed = parser.parse(xml);
-    const channel = parsed?.rss?.channel ?? parsed?.feed;
-    const rawItems: any[] = channel?.item ?? channel?.entry ?? [];
-    const items = Array.isArray(rawItems) ? rawItems : [rawItems];
-
-    return items
-      .map(item => parseItem(item, source.name, source.tier))  // 传入 tier
-      .filter((a): a is Article => a !== null);
-  } catch (err: any) {
-    const reason = err?.name === 'AbortError' ? '请求超时' : err?.message;
-    console.warn(`⚠️  [${source.name}] 抓取失败：${reason}`);
-    return [];
-  } finally {
-    clearTimeout(timeout);
-  }
+function buildArticleEntry(article: Article, index: number): string {
+  return [
+    `### ${index}. [${article.title}](${article.link})`,
+    '',
+    `> ${article.summary}`,
+    '',
+    `- 🕐 **发布时间：** ${formatTime(article.publishedAt)}`,
+    `- 🏷️ **来源：** ${article.source}`,
+    '',
+    '---',
+    '',
+  ].join('\n');
 }
 
-export async function fetchAllSources(sources: RSSSource[]): Promise<Article[]> {
-  const results = await Promise.allSettled(sources.map(fetchSource));
-  return results.flatMap(r => (r.status === 'fulfilled' ? r.value : []));
+const SOURCE_EMOJI: Record<SourceName, string> = {
+  TechCrunch: '🟠',
+  TheVerge:   '🔵',
+  HackerNews: '🟡',
+};
+
+export async function generateReport(articles: Article[]): Promise<string> {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+  }).replace(/\//g, '-');
+
+  const header = [
+    `# 🤖 AI 新闻日报 · ${dateStr}`,
+    '',
+    `> 生成时间：${formatTime(now)}`,
+    `> 数据来源：TechCrunch AI · The Verge AI · Hacker News`,
+    '',
+    '---',
+    '',
+  ].join('\n');
+
+  const stats = buildStats(articles);
+
+  const groups = articles.reduce<Record<string, Article[]>>((acc, a) => {
+    (acc[a.source] ??= []).push(a);
+    return acc;
+  }, {});
+
+  let globalIndex = 1;
+  const sections = Object.entries(groups).map(([source, items]) => {
+    const emoji = SOURCE_EMOJI[source as SourceName] ?? '📰';
+    const heading = `## ${emoji} ${source} (${items.length} 篇)\n\n`;
+    const entries = items.map(a => buildArticleEntry(a, globalIndex++)).join('');
+    return heading + entries;
+  }).join('\n');
+
+  const content = header + stats + '---\n\n' + sections;
+
+  const outputDir = path.resolve('output');
+  await fs.mkdir(outputDir, { recursive: true });
+  const filePath = path.join(outputDir, `ai-daily-${dateStr}.md`);
+  await fs.writeFile(filePath, content, 'utf-8');
+
+  return filePath;
 }
