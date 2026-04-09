@@ -634,6 +634,11 @@ function getCommonCSS(): string {
 async function main() {
   const { dateStr, weekDay } = getBeijingDate();
   console.log('📰 正在生成 ' + dateStr + ' 日报...');
+  const dailyDir = path.join('output', dateStr);
+if (fs.existsSync(dailyDir)) {
+  fs.rmSync(dailyDir, { recursive: true, force: true });
+  console.log('🗑️  已清除旧文件：' + dailyDir);
+}
 
   console.log('🌐 正在抓取新闻源...');
   const allArticles = await fetchAllSources(SOURCES);
