@@ -32,14 +32,12 @@ function getBeijingDate(): { dateStr: string; weekDay: string } {
   return { dateStr: `${y}-${m}-${d}`, weekDay: days[beijing.getUTCDay()] };
 }
 
-// ✅ 修复：用纯数字计算，避免时区解析歧义
 function getWeekDayFromDateStr(dateStr: string): string {
   const weekDayMap: Record<string, string> = {
     '0': '星期日', '1': '星期一', '2': '星期二', '3': '星期三',
     '4': '星期四', '5': '星期五', '6': '星期六',
   };
   const [y, m, d] = dateStr.split('-').map(Number);
-  // 直接用 UTC 构造北京当天日期，getUTCDay() 即为北京时间星期
   const date = new Date(Date.UTC(y, m - 1, d));
   return weekDayMap[String(date.getUTCDay())];
 }
@@ -57,7 +55,6 @@ function scoreAndFilter(articles: Article[]): Article[] {
     const freshnessScore = Math.max(0, 1 - ageHours / 24);
     return { ...a, score: truthScore * 0.5 + freshnessScore * 0.5 };
   });
-  // ✅ 修复：从 30 提升到 60，给 AI 更多素材
   return scored.sort((a, b) => (b as any).score - (a as any).score).slice(0, 60);
 }
 
@@ -115,7 +112,6 @@ async function generateSections(rawJson: string, dateStr: string): Promise<strin
   + '  ]\n'
   + '}\n\n'
   + '分类规则：\n'
-  // ✅ 修复：每个分类从 3-5 条改为 5-10 条
   + '- cat1.highlights：今日最重要5-10条，优先选 tier=1 的内容，标题译成中文\n'
   + '- cat2：头部企业动态（DeepMind/微软/百度/阿里/腾讯/字节等），5-10条\n'
   + '- cat3：融资/投资/估值/收购新闻，5-10条\n'
@@ -129,10 +125,10 @@ async function generateSections(rawJson: string, dateStr: string): Promise<strin
   + '- 不得编造原始新闻中没有的内容';
 
   const response = await client.chat.completions.create({
-    model: 'moonshot-v1-32k',
+    model: 'kimi-k2.5',       // ✅ 升级：从 moonshot-v1-32k 换为 kimi-k2.5
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
-    max_tokens: 8000,
+    max_tokens: 16000,         // ✅ 修复：从 8000 放大到 16000，解决输出截断问题
   });
   return response.choices[0].message.content || '{}';
 }
@@ -290,7 +286,6 @@ function buildDailyHTML(jsonStr: string, dateStr: string, weekDay: string, total
 function buildIndexHTML(dates: { dateStr: string; weekDay: string }[]): string {
   const cardHTML = dates.map((item, i) => {
     const isLatest = i === 0;
-    // ✅ 修复：用 getWeekDayFromDateStr 重新计算，确保准确
     const weekDay = item.weekDay || getWeekDayFromDateStr(item.dateStr);
     return `
 <a href="./${item.dateStr}/index.html" class="date-card ${isLatest ? 'date-card-latest' : ''}">
@@ -420,7 +415,6 @@ function scanHistoryDates(): { dateStr: string; weekDay: string }[] {
   return fs.readdirSync(outputDir)
     .filter(name => /^\d{4}-\d{2}-\d{2}$/.test(name))
     .sort((a, b) => b.localeCompare(a))
-    // ✅ 修复：统一用 getWeekDayFromDateStr 计算星期
     .map(dateStr => ({ dateStr, weekDay: getWeekDayFromDateStr(dateStr) }));
 }
 
@@ -635,10 +629,10 @@ async function main() {
   const { dateStr, weekDay } = getBeijingDate();
   console.log('📰 正在生成 ' + dateStr + ' 日报...');
   const dailyDir = path.join('output', dateStr);
-if (fs.existsSync(dailyDir)) {
-  fs.rmSync(dailyDir, { recursive: true, force: true });
-  console.log('🗑️  已清除旧文件：' + dailyDir);
-}
+  if (fs.existsSync(dailyDir)) {
+    fs.rmSync(dailyDir, { recursive: true, force: true });
+    console.log('🗑️  已清除旧文件：' + dailyDir);
+  }
 
   console.log('🌐 正在抓取新闻源...');
   const allArticles = await fetchAllSources(SOURCES);
