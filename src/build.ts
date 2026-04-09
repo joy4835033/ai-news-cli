@@ -32,6 +32,18 @@ function getBeijingDate(): { dateStr: string; weekDay: string } {
   return { dateStr: `${y}-${m}-${d}`, weekDay: days[beijing.getUTCDay()] };
 }
 
+// ✅ 修复：用纯数字计算，避免时区解析歧义
+function getWeekDayFromDateStr(dateStr: string): string {
+  const weekDayMap: Record<string, string> = {
+    '0': '星期日', '1': '星期一', '2': '星期二', '3': '星期三',
+    '4': '星期四', '5': '星期五', '6': '星期六',
+  };
+  const [y, m, d] = dateStr.split('-').map(Number);
+  // 直接用 UTC 构造北京当天日期，getUTCDay() 即为北京时间星期
+  const date = new Date(Date.UTC(y, m - 1, d));
+  return weekDayMap[String(date.getUTCDay())];
+}
+
 function filterRecent(articles: Article[]): Article[] {
   const cutoff = Date.now() - 24 * 60 * 60 * 1000;
   return articles.filter(a => a.publishedAt.getTime() > cutoff);
@@ -45,7 +57,8 @@ function scoreAndFilter(articles: Article[]): Article[] {
     const freshnessScore = Math.max(0, 1 - ageHours / 24);
     return { ...a, score: truthScore * 0.5 + freshnessScore * 0.5 };
   });
-  return scored.sort((a, b) => (b as any).score - (a as any).score).slice(0, 30);
+  // ✅ 修复：从 30 提升到 60，给 AI 更多素材
+  return scored.sort((a, b) => (b as any).score - (a as any).score).slice(0, 60);
 }
 
 function articlesToPromptJson(articles: Article[]): string {
@@ -102,13 +115,15 @@ async function generateSections(rawJson: string, dateStr: string): Promise<strin
   + '  ]\n'
   + '}\n\n'
   + '分类规则：\n'
-  + '- cat1.highlights：今日最重要3-5条，优先选 tier=1 的内容，标题译成中文\n'
-  + '- cat2：头部企业动态（DeepMind/微软/百度/阿里/腾讯/字节等），3-5条\n'
-  + '- cat3：融资/投资/估值/收购新闻，3-5条\n'
-  + '- cat4：模型发布/算法突破/硬件革新，3-5条\n'
-  + '- cat5：新产品/功能上线/App发布/平台更新，3-5条\n'
-  + '- cat6：AI教育/学习工具/在线课程/技能培训，3-5条\n'
-  + '- cat7：从今日新闻中提炼3-5条适合普通人的AI副业或创业机会，给出具体方向标签\n'
+  // ✅ 修复：每个分类从 3-5 条改为 5-10 条
+  + '- cat1.highlights：今日最重要5-10条，优先选 tier=1 的内容，标题译成中文\n'
+  + '- cat2：头部企业动态（DeepMind/微软/百度/阿里/腾讯/字节等），5-10条\n'
+  + '- cat3：融资/投资/估值/收购新闻，5-10条\n'
+  + '- cat4：模型发布/算法突破/硬件革新，5-10条\n'
+  + '- cat5：新产品/功能上线/App发布/平台更新，5-10条\n'
+  + '- cat6：AI教育/学习工具/在线课程/技能培训，5-10条\n'
+  + '- cat7：从今日新闻中提炼5-10条适合普通人的AI副业或创业机会，给出具体方向标签\n'
+  + '- 若原始新闻中该分类内容不足5条，则全部收录，不得编造不存在的新闻\n'
   + '- 无相关内容返回空数组[]\n'
   + '- 所有 title 和 summary 必须是中文\n'
   + '- 不得编造原始新闻中没有的内容';
@@ -152,7 +167,6 @@ function newsAccordion(items: any[], extraField?: string): string {
   }).join('');
 }
 
-// ── 生成日报页 HTML ───────────────────────────────────
 function buildDailyHTML(jsonStr: string, dateStr: string, weekDay: string, total: number): string {
   const data = JSON.parse(jsonStr);
   const cat1 = data.cat1 || {};
@@ -273,20 +287,11 @@ function buildDailyHTML(jsonStr: string, dateStr: string, weekDay: string, total
 </html>`;
 }
 
-// ── 生成首页 HTML ─────────────────────────────────────
 function buildIndexHTML(dates: { dateStr: string; weekDay: string }[]): string {
-  const weekDayMap: Record<string, string> = {
-    '0': '星期日', '1': '星期一', '2': '星期二', '3': '星期三',
-    '4': '星期四', '5': '星期五', '6': '星期六',
-  };
-
-  function getWeekDay(dateStr: string): string {
-    const d = new Date(dateStr + 'T00:00:00+08:00');
-    return weekDayMap[String(d.getDay())];
-  }
-
   const cardHTML = dates.map((item, i) => {
     const isLatest = i === 0;
+    // ✅ 修复：用 getWeekDayFromDateStr 重新计算，确保准确
+    const weekDay = item.weekDay || getWeekDayFromDateStr(item.dateStr);
     return `
 <a href="./${item.dateStr}/index.html" class="date-card ${isLatest ? 'date-card-latest' : ''}">
       <div class="date-card-left">
@@ -294,7 +299,7 @@ function buildIndexHTML(dates: { dateStr: string; weekDay: string }[]): string {
         <div class="date-card-month">${item.dateStr.slice(0, 7)}</div>
       </div>
       <div class="date-card-right">
-        <div class="date-card-week">${item.weekDay || getWeekDay(item.dateStr)}</div>
+        <div class="date-card-week">${weekDay}</div>
         <div class="date-card-label">AI 科技日报</div>
       </div>
       ${isLatest ? '<span class="date-card-badge">最新</span>' : ''}
@@ -347,9 +352,7 @@ function buildIndexHTML(dates: { dateStr: string; weekDay: string }[]): string {
     }
     .date-card:hover { border-color: var(--accent); background: rgba(124,106,255,0.04); }
     .date-card-latest { border-color: rgba(124,106,255,0.4); background: rgba(124,106,255,0.06); }
-    .date-card-left {
-      text-align: center; min-width: 48px;
-    }
+    .date-card-left { text-align: center; min-width: 48px; }
     .date-card-day {
       font-size: 1.8rem; font-weight: 700; color: var(--text);
       font-family: 'Space Grotesk', monospace; line-height: 1;
@@ -411,24 +414,16 @@ function buildIndexHTML(dates: { dateStr: string; weekDay: string }[]): string {
 </html>`;
 }
 
-// ── 扫描历史日期目录 ──────────────────────────────────
 function scanHistoryDates(): { dateStr: string; weekDay: string }[] {
   const outputDir = 'output';
   if (!fs.existsSync(outputDir)) return [];
-  const weekDayMap: Record<string, string> = {
-    '0': '星期日', '1': '星期一', '2': '星期二', '3': '星期三',
-    '4': '星期四', '5': '星期五', '6': '星期六',
-  };
   return fs.readdirSync(outputDir)
     .filter(name => /^\d{4}-\d{2}-\d{2}$/.test(name))
     .sort((a, b) => b.localeCompare(a))
-    .map(dateStr => {
-      const d = new Date(dateStr + 'T00:00:00+08:00');
-      return { dateStr, weekDay: weekDayMap[String(d.getDay())] };
-    });
+    // ✅ 修复：统一用 getWeekDayFromDateStr 计算星期
+    .map(dateStr => ({ dateStr, weekDay: getWeekDayFromDateStr(dateStr) }));
 }
 
-// ── 公共 CSS ──────────────────────────────────────────
 function getCommonCSS(): string {
   return `
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
@@ -636,7 +631,6 @@ function getCommonCSS(): string {
   `;
 }
 
-// ── 主流程 ────────────────────────────────────────────
 async function main() {
   const { dateStr, weekDay } = getBeijingDate();
   console.log('📰 正在生成 ' + dateStr + ' 日报...');
@@ -672,14 +666,12 @@ async function main() {
     for (let i = 0; i < opens - closes; i++) safeJson += '}';
   }
 
-  // 写入今日日报
   const dailyDir = path.join('output', dateStr);
   fs.mkdirSync(dailyDir, { recursive: true });
   const dailyHTML = buildDailyHTML(safeJson, dateStr, weekDay, recent.length);
   fs.writeFileSync(path.join(dailyDir, 'index.html'), dailyHTML, 'utf-8');
   console.log('✅ 日报写入 output/' + dateStr + '/index.html');
 
-  // 扫描所有历史日期，生成首页
   const allDates = scanHistoryDates();
   const indexHTML = buildIndexHTML(allDates);
   fs.writeFileSync(path.join('output', 'index.html'), indexHTML, 'utf-8');
