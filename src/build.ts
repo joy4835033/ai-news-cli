@@ -671,7 +671,6 @@ if (fs.existsSync(dailyDir)) {
     for (let i = 0; i < opens - closes; i++) safeJson += '}';
   }
 
-  const dailyDir = path.join('output', dateStr);
   fs.mkdirSync(dailyDir, { recursive: true });
   const dailyHTML = buildDailyHTML(safeJson, dateStr, weekDay, recent.length);
   fs.writeFileSync(path.join(dailyDir, 'index.html'), dailyHTML, 'utf-8');
