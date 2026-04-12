@@ -125,7 +125,9 @@ async function generateSections(rawJson: string, dateStr: string): Promise<strin
 
   + '- 无相关内容返回空数组[]\n'
   + '- 所有 title 和 summary 必须是中文\n'
-  + '- 不得编造原始新闻中没有的内容';
+  + '- 不得编造原始新闻中没有的内容\n'
+  + '- 返回的JSON中禁止使用中文引号（"和"），所有字符串必须使用英文双引号(")';
+
 
   let response;
   const maxRetries = 3;
