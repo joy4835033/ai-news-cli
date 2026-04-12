@@ -124,12 +124,21 @@ async function generateSections(rawJson: string, dateStr: string): Promise<strin
   + '- 所有 title 和 summary 必须是中文\n'
   + '- 不得编造原始新闻中没有的内容';
 
-  const response = await client.chat.completions.create({
-    model: 'kimi-k2.5',       // ✅ 升级：从 moonshot-v1-32k 换为 kimi-k2.5
-    messages: [{ role: 'user', content: prompt }],
-    response_format: { type: 'json_object' },
-    max_tokens: 16000,         // ✅ 修复：从 8000 放大到 16000，解决输出截断问题
-  });
+    let response;
+  try {
+    response = await client.chat.completions.create({
+      model: 'kimi-k2.5',       // ✅ 升级：从 moonshot-v1-32k 换为 kimi-k2.5
+      messages: [{ role: 'user', content: prompt }],
+      response_format: { type: 'json_object' },
+      max_tokens: 16000,         // ✅ 修复：从 8000 放大到 16000，解决输出截断问题
+    });
+  } catch (err) {
+    console.error('❌ Kimi API 调用报错：', err);
+    return '{}';
+  }
+  console.log('🔍 model:', response.model);
+  console.log('🔍 finish_reason:', response.choices[0].finish_reason);
+  console.log('🔍 usage:', JSON.stringify(response.usage));
   return response.choices[0].message.content || '{}';
 }
 
