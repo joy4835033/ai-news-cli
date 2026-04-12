@@ -5,8 +5,8 @@ import { fetchAllSources } from './fetcher.js';
 import { Article, RSSSource } from './types.js';
 
 const client = new OpenAI({
-  apiKey: process.env.MOONSHOT_API_KEY,
-  baseURL: 'https://api.moonshot.cn/v1',
+  apiKey: process.env.DEEPSEEK_API_KEY,
+  baseURL: 'https://api.deepseek.com/v1',
 });
 
 const SOURCES: RSSSource[] = [
@@ -124,18 +124,38 @@ async function generateSections(rawJson: string, dateStr: string): Promise<strin
   + '- 所有 title 和 summary 必须是中文\n'
   + '- 不得编造原始新闻中没有的内容';
 
-    let response;
-  try {
-    response = await client.chat.completions.create({
-      model: 'kimi-k2.5',       // ✅ 升级：从 moonshot-v1-32k 换为 kimi-k2.5
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
-      max_tokens: 16000,         // ✅ 修复：从 8000 放大到 16000，解决输出截断问题
-    });
-  } catch (err) {
-    console.error('❌ Kimi API 调用报错：', err);
-    return '{}';
+  let response;
+  const maxRetries = 3;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      response = await client.chat.completions.create({
+        model: 'deepseek-chat',
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
+        max_tokens: 16000,
+      });
+
+      const finishReason = response.choices[0].finish_reason;
+      console.log(`🔍 attempt ${attempt} finish_reason:`, finishReason);
+
+      if (finishReason === 'engine_overloaded' || finishReason === 'error') {
+        console.warn(`⚠️  第${attempt}次失败(${finishReason})，${attempt * 15}秒后重试...`);
+        await new Promise(r => setTimeout(r, attempt * 15000));
+        continue;
+      }
+
+      break;
+
+    } catch (err) {
+      console.error(`❌ 第${attempt}次调用报错：`, err);
+      if (attempt === maxRetries) return '{}';
+      await new Promise(r => setTimeout(r, attempt * 15000));
+    }
   }
+
+  if (!response) return '{}';
+
   console.log('🔍 model:', response.model);
   console.log('🔍 finish_reason:', response.choices[0].finish_reason);
   console.log('🔍 usage:', JSON.stringify(response.usage));
@@ -286,7 +306,7 @@ function buildDailyHTML(jsonStr: string, dateStr: string, weekDay: string, total
 </div>
 <footer>
   <div class="footer-left">Joy 每日新闻播报 · ${dateStr} · ${weekDay}</div>
-  <div class="footer-right">Powered by Moonshot AI</div>
+  <div class="footer-right">Powered by DeepSeek</div>
 </footer>
 </body>
 </html>`;
@@ -412,7 +432,7 @@ function buildIndexHTML(dates: { dateStr: string; weekDay: string }[]): string {
 </div>
 <footer>
   <div class="footer-left">Joy 每日新闻播报 · 历史存档</div>
-  <div class="footer-right">Powered by Moonshot AI</div>
+  <div class="footer-right">Powered by DeepSeek</div>
 </footer>
 </body>
 </html>`;
@@ -661,7 +681,7 @@ async function main() {
   const promptJson = articlesToPromptJson(filtered);
   const jsonStr = await generateSections(promptJson, dateStr);
   console.log('✅ AI 整理完成');
-    console.log('📦 AI 原始返回（前500字）：', jsonStr.slice(0, 500));
+  console.log('📦 AI 原始返回（前500字）：', jsonStr.slice(0, 500));
 
   let safeJson = jsonStr;
   try {
