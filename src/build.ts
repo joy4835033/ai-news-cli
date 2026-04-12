@@ -652,6 +652,7 @@ async function main() {
   const promptJson = articlesToPromptJson(filtered);
   const jsonStr = await generateSections(promptJson, dateStr);
   console.log('✅ AI 整理完成');
+    console.log('📦 AI 原始返回（前500字）：', jsonStr.slice(0, 500));
 
   let safeJson = jsonStr;
   try {
