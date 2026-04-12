@@ -133,7 +133,7 @@ async function generateSections(rawJson: string, dateStr: string): Promise<strin
         model: 'deepseek-chat',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' },
-        max_tokens: 16000,
+        max_tokens: 8192,
       });
 
       const finishReason = response.choices[0].finish_reason;
