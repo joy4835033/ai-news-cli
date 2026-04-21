@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joy 每日新闻播报 · 2026-04-21</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --bg2: #0f0f1a; --card: #13131f;
+      --border: #1e1e35; --border2: #252540;
+      --accent: #7c6aff; --cyan: #00e5ff; --pink: #ff6b9d;
+      --text: #e8e8f0; --muted: #6b6b8a; --muted2: #4a4a6a;
+      --radius-lg: 12px; --radius-md: 8px; --radius-sm: 5px;
+    }
+    body {
+      font-family: 'Noto Sans SC', 'Space Grotesk', -apple-system, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.7; font-size: 14px; -webkit-font-smoothing: antialiased;
+    }
+    header {
+      background: rgba(10,10,15,0.95); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border); height: 64px;
+      display: flex; align-items: center; padding: 0 2rem;
+      position: sticky; top: 0; z-index: 200;
+    }
+    header::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--cyan), var(--accent), transparent);
+    }
+    .header-inner {
+      max-width: 1240px; margin: 0 auto; width: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 8px;
+      border: 1px solid var(--border2); color: var(--muted);
+      text-decoration: none; transition: all 0.15s;
+    }
+    .back-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(124,106,255,0.08); }
+    .brand-mark {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent) 0%, #5b4fd4 100%);
+      border-radius: 9px; display: flex; align-items: center; justify-content: center;
+      font-size: 17px; box-shadow: 0 0 16px rgba(124,106,255,0.4); flex-shrink: 0;
+    }
+    .brand-name { font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: 0.3px; }
+    .brand-sub  { font-size: 0.62rem; color: var(--muted); letter-spacing: 3px; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 1.5rem; }
+    .header-date-block { text-align: right; }
+    .date-main { font-size: 0.88rem; font-weight: 600; color: var(--text); font-family: 'Space Grotesk', monospace; }
+    .date-week { font-size: 0.65rem; color: var(--muted); margin-top: 2px; letter-spacing: 2px; }
+    .header-divider { width: 1px; height: 28px; background: var(--border2); }
+    .header-tag {
+      font-size: 0.65rem; font-weight: 600; color: var(--cyan);
+      border: 1px solid rgba(0,229,255,0.3); background: rgba(0,229,255,0.06);
+      padding: 3px 10px; border-radius: 20px; letter-spacing: 2px;
+    }
+    .layout {
+      max-width: 1240px; margin: 1.75rem auto; padding: 0 1.5rem;
+      display: grid; grid-template-columns: 172px 1fr; gap: 1.5rem; align-items: start;
+    }
+    .sidenav {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1rem 0.75rem; position: sticky; top: 76px;
+    }
+    .sidenav-title {
+      font-size: 0.6rem; font-weight: 700; color: var(--muted2);
+      letter-spacing: 3px; text-transform: uppercase;
+      padding: 0 0.5rem 0.65rem; border-bottom: 1px solid var(--border); margin-bottom: 0.6rem;
+    }
+    .nav-link {
+      display: flex; align-items: center; gap: 8px; padding: 0.5rem 0.65rem;
+      border-radius: var(--radius-sm); font-size: 0.82rem; font-weight: 500;
+      color: var(--muted); text-decoration: none; transition: all 0.15s ease; margin-bottom: 2px;
+    }
+    .nav-link:hover { background: rgba(124,106,255,0.1); color: var(--accent); }
+    .nav-icon { font-size: 0.9rem; flex-shrink: 0; }
+    .main-content { display: flex; flex-direction: column; gap: 1.25rem; }
+    .section {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1.6rem 1.8rem; transition: border-color 0.2s;
+    }
+    .section:hover { border-color: var(--border2); }
+    .sec-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.3rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--border);
+    }
+    .sec-header-left { display: flex; align-items: center; gap: 9px; }
+    .sec-icon { font-size: 1.05rem; }
+    .sec-header h2 { font-size: 0.95rem; font-weight: 700; color: var(--text); letter-spacing: 0.5px; }
+    .sec-badge {
+      font-size: 0.65rem; font-weight: 600; color: var(--muted);
+      background: var(--bg2); border: 1px solid var(--border);
+      padding: 3px 11px; border-radius: 20px; letter-spacing: 1px;
+    }
+    .sub-block { margin-bottom: 1.3rem; }
+    .sub-block:last-child { margin-bottom: 0; }
+    .sub-label {
+      font-size: 0.62rem; font-weight: 700; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: 3px; margin-bottom: 0.8rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sub-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .insight-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.1rem; }
+    .insight-card {
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 1.1rem 1.2rem; background: var(--bg2);
+    }
+    .insight-card.accent-cyan  { background: rgba(0,229,255,0.04);  border-color: rgba(0,229,255,0.2); }
+    .insight-card.accent-pink  { background: rgba(255,107,157,0.04); border-color: rgba(255,107,157,0.2); }
+    .insight-label {
+      font-size: 0.68rem; font-weight: 700; color: var(--muted);
+      margin-bottom: 0.6rem; display: flex; align-items: center; gap: 6px; letter-spacing: 1px;
+    }
+    .insight-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .dot-purple { background: var(--accent); box-shadow: 0 0 6px rgba(124,106,255,0.6); }
+    .dot-cyan   { background: var(--cyan);   box-shadow: 0 0 6px rgba(0,229,255,0.6); }
+    .dot-pink   { background: var(--pink);   box-shadow: 0 0 6px rgba(255,107,157,0.6); }
+    .insight-text { font-size: 0.83rem; color: var(--muted); line-height: 1.85; }
+    details.acc-item > summary { list-style: none; }
+    details.acc-item > summary::-webkit-details-marker { display: none; }
+    .acc-item {
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      margin-bottom: 6px; overflow: hidden; transition: border-color 0.15s;
+    }
+    .acc-item:last-child { margin-bottom: 0; }
+    .acc-item:hover { border-color: var(--accent); }
+    .acc-title {
+      display: flex; align-items: center; gap: 12px; padding: 0.85rem 1.1rem;
+      background: var(--bg2); cursor: pointer; user-select: none;
+      -webkit-tap-highlight-color: transparent; transition: background 0.15s; width: 100%;
+    }
+    .acc-title:hover { background: rgba(124,106,255,0.06); }
+    details[open] > .acc-title { background: rgba(124,106,255,0.1); border-bottom: 1px solid var(--border); }
+    .acc-index {
+      font-size: 0.6rem; font-weight: 700; color: var(--accent);
+      background: rgba(124,106,255,0.12); border: 1px solid rgba(124,106,255,0.25);
+      padding: 2px 7px; border-radius: 4px; flex-shrink: 0; min-width: 28px; text-align: center;
+      font-family: 'Space Grotesk', monospace; transition: all 0.15s;
+    }
+    details[open] > .acc-title .acc-index {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+      box-shadow: 0 0 8px rgba(124,106,255,0.5);
+    }
+    .acc-text { flex: 1; font-size: 0.88rem; font-weight: 500; color: var(--text); line-height: 1.5; }
+    .acc-arrow {
+      color: var(--muted2); transition: transform 0.22s ease, color 0.15s;
+      flex-shrink: 0; display: flex; align-items: center;
+    }
+    details[open] > .acc-title .acc-arrow { transform: rotate(90deg); color: var(--accent); }
+    .acc-body {
+      padding: 1rem 1.1rem 1rem 3.1rem; background: var(--bg);
+      font-size: 0.85rem; color: var(--muted); line-height: 1.9;
+    }
+    .acc-summary { margin-bottom: 0.75rem; }
+    .acc-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .acc-tag {
+      display: inline-flex; align-items: center; font-size: 0.68rem; font-weight: 600;
+      color: var(--cyan); background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2);
+      padding: 2px 10px; border-radius: 4px; letter-spacing: 0.5px;
+    }
+    .acc-source-link {
+      display: inline-flex; align-items: center; font-size: 0.68rem; font-weight: 600;
+      color: var(--muted); text-decoration: none; background: var(--bg2);
+      border: 1px solid var(--border2); padding: 2px 10px; border-radius: 4px;
+      transition: color 0.15s, border-color 0.15s, background 0.15s; letter-spacing: 0.5px;
+    }
+    .acc-source-link:hover {
+      color: var(--accent); border-color: rgba(124,106,255,0.4); background: rgba(124,106,255,0.08);
+    }
+    .empty {
+      font-size: 0.82rem; color: var(--muted2); padding: 1.5rem 0;
+      text-align: center; border: 1px dashed var(--border);
+      border-radius: var(--radius-md); letter-spacing: 2px;
+    }
+    footer {
+      max-width: 1240px; margin: 0 auto 2.5rem; padding: 1.5rem 1.5rem 0;
+      border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-left  { font-size: 0.72rem; color: var(--muted2); letter-spacing: 1px; }
+    .footer-right {
+      font-size: 0.65rem; color: var(--accent); background: rgba(124,106,255,0.08);
+      border: 1px solid rgba(124,106,255,0.2); padding: 3px 12px; border-radius: 20px; letter-spacing: 1px;
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
+    @media (max-width: 768px) {
+      header { padding: 0 1rem; height: 56px; }
+      .header-divider, .header-tag { display: none; }
+      .layout { grid-template-columns: 1fr; margin: 1rem auto; padding: 0 0.75rem; gap: 0.85rem; }
+      .sidenav { position: static; display: flex; flex-wrap: wrap; gap: 6px; padding: 0.75rem; }
+      .sidenav-title { width: 100%; margin-bottom: 0.2rem; }
+      .nav-link { padding: 0.38rem 0.75rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; font-size: 0.78rem; }
+      .section { padding: 1rem; }
+      .insight-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+      .acc-title { padding: 0.9rem 1rem; }
+      .acc-body  { padding: 0.85rem 0.9rem 0.9rem 2.4rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.25rem 1rem 0; margin-bottom: 1.5rem; }
+    }
+    @media (max-width: 400px) {
+      .acc-text { font-size: 0.84rem; }
+      .section  { padding: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <a href="../" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div class="brand-mark">📡</div>
+      <div>
+        <div class="brand-name">Joy 每日新闻播报</div>
+        <div class="brand-sub">AI · TECH · INSIGHT</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-tag">DAILY BRIEFING</div>
+      <div class="header-divider"></div>
+      <div class="header-date-block">
+        <div class="date-main">2026-04-21</div>
+        <div class="date-week">星期二</div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidenav">
+    <div class="sidenav-title">栏目导航</div>
+    <a href="#sec-1" class="nav-link"><span class="nav-icon">🔮</span><span>要点整理</span></a><a href="#sec-2" class="nav-link"><span class="nav-icon">🏭</span><span>行业动态</span></a><a href="#sec-3" class="nav-link"><span class="nav-icon">💰</span><span>投资融资</span></a><a href="#sec-4" class="nav-link"><span class="nav-icon">⚡</span><span>技术突破</span></a><a href="#sec-5" class="nav-link"><span class="nav-icon">📦</span><span>产品上线</span></a><a href="#sec-6" class="nav-link"><span class="nav-icon">🎓</span><span>AI 教育</span></a><a href="#sec-7" class="nav-link"><span class="nav-icon">🚀</span><span>创业机会</span></a>
+  </nav>
+  <main class="main-content">
+    
+    <section class="section" id="sec-1">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">🔮</span><h2>要点整理</h2></div>
+        <span class="sec-badge">今日收录 86 篇</span>
+      </div>
+      <div class="sub-block">
+        <div class="sub-label">今日新闻摘录</div>
+        
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">苹果公司宣布约翰·特纳斯将接替蒂姆·库克担任首席执行官</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">苹果公司宣布内部高管约翰·特纳斯将接替蒂姆·库克担任公司首席执行官，库克将转任执行董事长。这一人事变动标志着苹果自2011年以来首次更换最高领导人，特纳斯长期负责硬件业务，在iPhone、Mac等产品开发中发挥关键作用。此次交接预计将影响苹果未来产品战略方向，特别是在人工智能和硬件创新领域，投资者将密切关注新领导层如何延续苹果的增长轨迹。</p>
+          <div class="acc-footer"><a href="https://www.apple.com/newsroom/2026/04/tim-cook-to-become-apple-executive-chairman-john-ternus-to-become-apple-ceo/" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">工信部：一季度规模以上高技术制造业增加值同比增长12.5%</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">工业和信息化部公布2026年一季度数据显示，规模以上高技术制造业增加值同比增长12.5%，显示产业科技创新走深走实。这一增长得益于人工智能等新技术在电子消费品行业的加速应用，以及首批国家级制造业中试平台和卓越级科技型企业孵化器的建立。高技术制造业的强劲增长表明中国经济结构持续优化，科技创新与产业创新深度融合正在成为经济增长的重要驱动力。</p>
+          <div class="acc-footer"><a href="https://36kr.com/newsflashes/3775949327581958?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">贝佐斯旗下人工智能实验室融资交易接近敲定，估值逼近380亿美元</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">杰夫·贝佐斯旗下人工智能实验室即将完成一笔100亿美元融资交易，企业估值达到380亿美元。这一巨额融资发生在人工智能行业竞争日益激烈的背景下，各大科技巨头和初创企业都在加大AI研发投入。贝佐斯实验室获得高估值融资将加剧全球AI竞争格局，可能推动新一轮AI技术创新浪潮，同时也反映了投资者对前沿AI技术商业化前景的乐观预期。</p>
+          <div class="acc-footer"><a href="https://36kr.com/newsflashes/3775911052378633?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">GitHub Copilot CLI正式进入全面可用阶段</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">GitHub Copilot CLI工具正式进入全面可用阶段，为开发者提供命令行界面的AI编程辅助功能。这一进展标志着AI编程助手从代码编辑器扩展到更广泛的开发工作流程，Copilot CLI能够理解自然语言命令并生成相应的命令行操作。全面可用将加速AI在软件开发中的普及，提高开发效率，同时也引发关于代码安全、知识产权和开发者技能演变的行业讨论。</p>
+          <div class="acc-footer"><a href="https://www.infoq.cn/article/NMxQFeHUc6EPw9QERWQj?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">05</span>
+          <span class="acc-text">小米宣布上线PC版龙虾，Xiaomi miclaw正式开启PC、Mac、有屏音箱多终端封测</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">小米宣布上线PC、Mac和有屏音箱版Xiaomi miclaw，并开启小范围封测，这是国内首款手机端AI智能体应用的多终端扩展。Xiaomi miclaw基于小米MiMo大模型构建，最初于3月6日上线手机端并开启封测，此次扩展显示小米正在构建跨设备的AI交互生态。多终端AI智能体的推出将加速AI在日常生活中的渗透，为用户提供更无缝的智能体验，同时也推动AI硬件生态的创新发展。</p>
+          <div class="acc-footer"><a href="https://36kr.com/newsflashes/3775943297139461?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">06</span>
+          <span class="acc-text">工信部：正在开展算电协同政策研究和标准制定</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">工业和信息化部表示正在开展算电协同政策研究和标准制定工作，以应对算力基础设施快速发展带来的能源挑战。随着人工智能和大数据应用的爆发式增长，算力需求急剧上升，电力消耗成为制约算力发展的关键因素。算电协同政策的制定将促进算力基础设施的绿色可持续发展，优化能源资源配置，为数字经济高质量发展提供坚实支撑。</p>
+          <div class="acc-footer"><a href="https://36kr.com/newsflashes/3775954067702273?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">07</span>
+          <span class="acc-text">截至3月底，全国5G基站总数已达495.8万个</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">国务院新闻办公室公布数据显示，截至2026年3月底，全国5G基站总数已达到495.8万个，显示中国5G网络建设持续推进。这一数字表明中国在5G基础设施部署方面保持全球领先地位，为数字经济发展奠定了坚实的网络基础。5G网络的广泛覆盖将加速物联网、工业互联网、自动驾驶等新兴技术的应用落地，推动产业数字化转型和智能化升级。</p>
+          <div class="acc-footer"><a href="https://36kr.com/newsflashes/3775955093422599?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      </div>
+      <div class="insight-grid">
+        <div class="insight-card">
+          <div class="insight-label"><span class="insight-dot dot-purple"></span>跨板块关联</div>
+          <div class="insight-text">今日新闻显示AI技术正从软件层面向硬件和基础设施深度渗透：小米推出多终端AI智能体，苹果高层变动可能影响硬件AI战略，工信部推动算电协同应对AI算力能耗挑战。软件、硬件、基础设施三个层面的联动表明AI产业化进入新阶段。</div>
+        </div>
+        <div class="insight-card accent-cyan">
+          <div class="insight-label"><span class="insight-dot dot-cyan"></span>创业方向建议</div>
+          <div class="insight-text">关注AI与垂直行业结合的机会，特别是AI在传统制造业、消费电子、能源管理等领域的应用。轻量级AI工具开发和AI辅助的开发工具也是值得关注的方向。</div>
+        </div>
+        <div class="insight-card accent-pink">
+          <div class="insight-label"><span class="insight-dot dot-pink"></span>风险预警</div>
+          <div class="insight-text">AI行业融资热度持续高涨可能催生估值泡沫，初创企业需警惕资本过热风险。同时，AI技术快速迭代可能导致产品生命周期缩短，企业需要建立快速适应能力。</div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="section" id="sec-2">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">🏭</span><h2>行业动态</h2></div>
+        <span class="sec-badge">5 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">苹果公司宣布约翰·特纳斯将接替蒂姆·库克担任首席执行官</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">苹果公司宣布内部高管约翰·特纳斯将接替蒂姆·库克担任公司首席执行官，库克将转任执行董事长。特纳斯长期负责苹果硬件业务，在iPhone、iPad、Mac等核心产品开发中扮演关键角色，这一人事变动发生在苹果积极布局人工智能和增强现实技术的时期。领导层更迭可能影响苹果未来产品战略，特别是在AI硬件集成和创新产品开发方面，投资者将密切关注新CEO如何平衡创新与盈利能力。</p>
+          <div class="acc-footer"><span class="acc-tag">苹果</span><a href="https://www.apple.com/newsroom/2026/04/tim-cook-to-become-apple-executive-chairman-john-ternus-to-become-apple-ceo/" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">小米宣布上线PC版龙虾，Xiaomi miclaw正式开启PC、Mac、有屏音箱多终端封测</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">小米宣布上线PC、Mac和有屏音箱版Xiaomi miclaw，并开启小范围封测，这是小米AI智能体应用的多终端扩展。Xiaomi miclaw基于小米MiMo大模型构建，最初作为手机端AI应用于3月上线，此次扩展显示小米正在构建跨设备的AI交互生态系统。多终端AI智能体的推出将增强小米硬件产品的智能化水平，为用户提供更连贯的AI体验，同时也加强了小米在AI消费级应用领域的竞争力。</p>
+          <div class="acc-footer"><span class="acc-tag">小米</span><a href="https://36kr.com/newsflashes/3775943297139461?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">谷歌：Chrome浏览器的Gemini功能将扩展至更多亚太地区国家</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">谷歌宣布Chrome浏览器中的Gemini功能将扩展至澳大利亚、印度尼西亚、日本、菲律宾、新加坡、韩国和越南等亚太地区国家。这一扩展是谷歌将AI功能集成到核心产品中的战略举措，Gemini在Chrome中的部署使用户能够直接在浏览器中使用AI助手。功能扩展将增强谷歌在亚太地区AI服务市场的覆盖，与当地竞争对手展开更直接的竞争，同时也推动AI助手在日常生活和工作中的普及。</p>
+          <div class="acc-footer"><span class="acc-tag">谷歌</span><a href="https://36kr.com/newsflashes/3775899763311107?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">北方华创：依照市场及客户需求情况合理定价，近期没有涨价预期</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">北方华创在互动平台表示，公司依照市场及客户需求情况合理定价，面对原材料价格上涨等情况，北方华创将综合运用供应链优化、技术创新降本等多种方式降低成本压力。北方华创明确表示近期没有涨价预期，这一表态发生在半导体设备行业面临成本压力的背景下。北方华创的定价策略可能影响国内半导体设备市场的竞争格局，同时也反映了公司在维护客户关系和市场份额方面的战略考量。</p>
+          <div class="acc-footer"><span class="acc-tag">北方华创</span><a href="https://36kr.com/newsflashes/3775907477619459?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">05</span>
+          <span class="acc-text">天齐锂业：一季度净利润同比预增1530.31%—1818.01%</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">天齐锂业披露业绩预告，预计2026年一季度归属于上市公司股东的净利润为17亿元至20亿元，同比增长1530.31%至1818.01%。这一惊人增长发生在锂价回升和新能源汽车需求持续增长的背景下，天齐锂业作为全球重要的锂资源供应商受益于行业景气度提升。业绩大幅预增将增强天齐锂业在锂产业链中的话语权，同时也可能引发投资者对锂行业周期性的关注，公司需要应对价格波动带来的经营挑战。</p>
+          <div class="acc-footer"><span class="acc-tag">天齐锂业</span><a href="https://36kr.com/p/3775059219792648?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-3">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">💰</span><h2>投资融资</h2></div>
+        <span class="sec-badge">4 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">贝佐斯旗下人工智能实验室融资交易接近敲定，估值逼近380亿美元</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">杰夫·贝佐斯旗下人工智能实验室即将完成一笔100亿美元融资交易，企业估值达到380亿美元。这一巨额融资发生在人工智能成为全球科技竞争焦点的背景下，贝佐斯实验室专注于前沿AI技术研发，可能涉及通用人工智能等尖端领域。高估值融资将显著增强贝佐斯实验室的研发实力，加剧全球AI巨头竞争，同时也可能推动AI技术突破，但巨额投资也带来了相应的回报压力和商业化挑战。</p>
+          <div class="acc-footer"><span class="acc-tag">100亿美元</span><a href="https://36kr.com/newsflashes/3775911052378633?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">智能锂电园林公司完成数千万元融资，出货量破万台</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">劳尼克斯科技（南京）有限公司近日完成数千万元融资，投资方为苏州天空工场、宜宾高新前沿科技产业基金、翼朴资本。劳尼克斯专注于智能锂电园林工具研发，产品涵盖割草机、打草机、修枝机等多种动力工具，采取全电压平台策略覆盖不同场景需求。融资将用于核心产品研发迭代、人才团队扩容升级以及海外市场布局，公司自今年1月大规模出货以来，单月销售额已突破千万元，显示智能园林工具市场的增长潜力。</p>
+          <div class="acc-footer"><span class="acc-tag">数千万元</span><a href="https://36kr.com/p/3774707915440897?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">启明创投“先拿壳再装资产”，VC/PE探路退出新模式</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">启明创投通过控股上市公司天迈科技后，启动收购其投资多年的芬能自动化100%股权，探索“先拿壳再装资产”的退出新模式。这一交易发生在VC/PE行业面临退出压力增大的背景下，传统IPO和并购退出渠道受限，创新退出方式成为行业关注焦点。若收购顺利完成，启明创投将为风险投资行业提供新的退出路径样本，可能引发更多VC/PE机构探索类似模式，但也需要关注监管政策和市场接受度等影响因素。</p>
+          <div class="acc-footer"><span class="acc-tag">未披露</span><a href="https://36kr.com/newsflashes/3775876032889606?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">空悬企业时驾科技获头部车企MPV车型独家定点</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">国产空气悬架供应商时驾科技已拿下某头部车企MPV车型的独家定点，项目将在今年四季度开始交付。时驾科技专注于空气悬架系统核心零部件、软硬件及系统解决方案，此次获得的定点项目是中国MPV界的标杆车型，对舒适性要求极高。获得头部车企MPV车型独家定点意味着时驾科技在空悬舒适性维度已走在行业前列，将显著提升公司市场地位，同时也反映了国产汽车零部件企业在高端细分市场的突破。</p>
+          <div class="acc-footer"><span class="acc-tag">未披露</span><a href="https://36kr.com/p/3775008761004549?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-4">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">⚡</span><h2>技术突破</h2></div>
+        <span class="sec-badge">5 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">跨维智能DexWorldModel斩获榜首，世界模型真正的考场在机器人执行里</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">跨维智能的DexWorldModel在相关评测中斩获榜首，这一成就表明世界模型的研究重点正在从理论验证转向实际机器人执行场景。世界模型作为具身智能的核心技术，旨在让AI系统理解和预测物理世界的变化，此前的研究多集中在模拟环境中的表现。跨维智能在机器人执行场景中的突破将推动世界模型技术的实用化进程，加速具身智能在工业自动化、服务机器人等领域的落地应用，重塑具身世界模型的评价方式和发展方向。</p>
+          <div class="acc-footer"><a href="https://www.qbitai.com/2026/04/403777.html" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">谷歌推出TurboQuant压缩技术，有望在低性能硬件上以更快的推理速度提供相同的准确率</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">谷歌推出TurboQuant压缩技术，该技术能够在低性能硬件上以更快的推理速度提供与原始模型相同的准确率。TurboQuant通过创新的量化方法减少模型大小和计算需求，同时保持模型性能，这一进展发生在边缘计算和移动端AI应用需求增长的背景下。新压缩技术将降低AI部署的硬件门槛，使更多设备能够运行复杂的AI模型，推动AI在物联网、移动设备等资源受限环境中的普及，加速AI技术的民主化进程。</p>
+          <div class="acc-footer"><a href="https://www.infoq.cn/article/T8zMkEAi0ZcalK2ZfhcL?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">谷歌发布Gemma 4，专注于本地优先、设备级的AI推理</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">谷歌发布Gemma 4模型，这一版本专注于本地优先、设备级的AI推理能力，强调在终端设备上高效运行AI模型。Gemma 4的发布反映了AI模型轻量化、本地化的发展趋势，随着隐私 concerns 和网络延迟问题日益突出，设备端AI变得愈发重要。新模型将推动AI应用向更分散的架构演进，减少对云端的依赖，增强用户数据隐私保护，同时也为智能手机、物联网设备等终端产品提供更强大的本地AI能力。</p>
+          <div class="acc-footer"><a href="https://www.infoq.cn/article/ghIyvrElfFO6uVAq9jBm?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">混元大模型加持！揭秘AI时代的SQL自动调优核心方案</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">腾讯混元大模型被应用于SQL自动调优领域，这一技术融合展示了AI在数据库优化中的创新应用。传统SQL调优依赖DBA经验，效率有限且难以规模化，混元大模型通过理解查询语义和数据特征，能够自动生成优化建议。AI驱动的SQL自动调优将显著提升数据库性能管理效率，降低企业运维成本，同时也体现了大模型从通用能力向垂直领域深入的发展趋势，为AI在企业级软件中的落地提供了新范例。</p>
+          <div class="acc-footer"><a href="https://www.infoq.cn/video/mMwbDBfQOpxCTvFkPhc1?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">05</span>
+          <span class="acc-text">TDSQL-C核心技术突破：AI加持下的Serverless智能化弹性四层架构解析</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">腾讯云TDSQL-C数据库实现核心技术突破，推出AI加持下的Serverless智能化弹性四层架构，这一创新将人工智能深度集成到数据库管理系统中。新架构通过AI算法实时预测负载变化，自动调整资源分配，实现真正的智能化弹性伸缩，解决了传统数据库资源调配滞后的问题。AI驱动的Serverless数据库架构将大幅提升资源利用效率，降低企业IT成本，同时也代表了数据库技术向智能化、自动化方向演进的重要里程碑。</p>
+          <div class="acc-footer"><a href="https://www.infoq.cn/video/qyTsCKj32wUD8Dmy3xWr?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-5">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">📦</span><h2>产品上线</h2></div>
+        <span class="sec-badge">5 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">GitHub Copilot CLI正式进入全面可用阶段</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">GitHub Copilot CLI工具正式进入全面可用阶段，为开发者提供命令行界面的AI编程辅助功能，这是GitHub将AI集成到软件开发全流程的重要一步。Copilot CLI能够理解自然语言描述的命令行任务，自动生成相应的命令序列，甚至解释复杂命令的作用，大大降低了命令行使用的学习门槛。全面可用将加速AI在开发工作流中的渗透，提高开发效率，特别是对于新手开发者和需要频繁使用命令行的运维人员，同时也推动了AI编程工具从代码编写向开发全流程的扩展。</p>
+          <div class="acc-footer"><span class="acc-tag">GitHub Copilot CLI</span><a href="https://www.infoq.cn/article/NMxQFeHUc6EPw9QERWQj?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">小米宣布上线PC版龙虾，Xiaomi miclaw正式开启PC、Mac、有屏音箱多终端封测</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">小米宣布上线PC、Mac和有屏音箱版Xiaomi miclaw，并开启小范围封测，这是小米AI智能体应用的多终端扩展。Xiaomi miclaw基于小米MiMo大模型构建，能够通过自然语言与用户交互，执行信息查询、任务安排、设备控制等多种功能，此次扩展实现了手机、电脑、智能音箱等多设备的覆盖。多终端AI智能体的推出将构建小米的跨设备AI交互生态，为用户提供更无缝的智能体验，同时也增强了小米硬件产品的差异化竞争力，推动AI在消费电子领域的普及。</p>
+          <div class="acc-footer"><span class="acc-tag">Xiaomi miclaw</span><a href="https://36kr.com/newsflashes/3775943297139461?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">谷歌：Chrome浏览器的Gemini功能将扩展至更多亚太地区国家</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">谷歌宣布Chrome浏览器中的Gemini功能将扩展至澳大利亚、印度尼西亚、日本、菲律宾、新加坡、韩国和越南等亚太地区国家。Gemini是集成在Chrome浏览器中的AI助手，用户可以通过侧边栏访问，获取网页内容摘要、回答问题、协助写作等多种AI功能，此前已在部分市场测试。功能扩展将增强谷歌在亚太地区AI服务市场的竞争力，与当地浏览器和AI产品展开直接竞争，同时也为用户提供了更便捷的浏览器内置AI工具，推动AI助手在日常网络浏览中的普及。</p>
+          <div class="acc-footer"><span class="acc-tag">Chrome浏览器Gemini功能</span><a href="https://36kr.com/newsflashes/3775899763311107?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">零门槛AI生成赛道再添新玩家，“灵珠”平台开启第一次内测</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">“灵珠”AI生成平台开启第一次内测，为零门槛AI生成赛道增添了新玩家，这一平台旨在降低AI内容创作的技术门槛。灵珠平台可能提供文本生成、图像创作、视频制作等多种AI生成功能，通过简化的用户界面和预设模板，使非技术用户也能轻松创建AI内容。新平台的加入加剧了AI生成工具市场的竞争，推动了AI创作工具的普及化和民主化，同时也反映了AI技术从专业工具向大众应用转变的趋势，为内容创作者提供了新的生产力工具。</p>
+          <div class="acc-footer"><span class="acc-tag">灵珠平台</span><a href="https://www.infoq.cn/article/ZPWKLMsW3qPTNKEog63r?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">05</span>
+          <span class="acc-text">专访Eight Sleep CTO：被马斯克们买爆的AI床垫，进中国先砍一刀订阅费</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">AI睡眠系统独角兽Eight Sleep在中国市场推出Pod 5智能深眠系统，售价19999元起，并通过微信小程序、京东、天猫等渠道销售。Pod 5系统通过传感器监测用户睡眠数据，利用AI算法自动调节床垫温度，优化睡眠环境，此前在海外市场受到包括马斯克在内的科技人士青睐。针对中国市场，Eight Sleep取消了199美元的软件订阅费，这一本土化策略反映了公司对中国市场特点的理解，同时也将加速智能睡眠产品在中国高端消费市场的渗透，推动睡眠科技行业的发展。</p>
+          <div class="acc-footer"><span class="acc-tag">Eight Sleep Pod 5智能深眠系统</span><a href="https://36kr.com/p/3775892441301511?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-6">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">🎓</span><h2>AI 教育资讯</h2></div>
+        <span class="sec-badge">0 条</span>
+      </div>
+      <div class="empty">· 暂无相关内容 ·</div>
+    </section>
+    <section class="section" id="sec-7">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">🚀</span><h2>创业机会</h2></div>
+        <span class="sec-badge">5 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">AI辅助园林工具开发与销售</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">适合硬件工程师、园林设备爱好者和跨境电商从业者，可切入智能锂电园林工具细分市场，如开发AI优化的智能割草机、修枝机等产品。变现方式包括硬件销售、订阅服务和数据增值服务，通过电商平台和线下渠道销售，结合AI算法提供个性化园林维护建议。这一方向受益于家庭园林自动化趋势和锂电工具替代燃油工具的市场转换，初期可从OEM合作或现有产品智能化改造入手。</p>
+          <div class="acc-footer"><span class="acc-tag">智能硬件/AI+园林</span><a href="https://36kr.com/p/3774707915440897?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">AI睡眠优化顾问服务</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">适合健康管理师、睡眠顾问和AI应用开发者，可基于智能床垫采集的数据提供个性化睡眠优化服务。切入点包括开发睡眠数据分析平台、提供AI睡眠改善方案订阅服务，或与酒店、高端公寓合作提供智能睡眠解决方案。变现方式有数据服务订阅费、企业解决方案销售和个性化咨询费，通过社交媒体健康内容引流，建立专业睡眠顾问品牌。这一方向契合健康消费升级趋势，初期可从睡眠数据解读和基础改善建议服务开始。</p>
+          <div class="acc-footer"><span class="acc-tag">健康科技/AI+睡眠</span><a href="https://36kr.com/p/3775892441301511?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">AI命令行工具开发与培训</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">适合软件开发者和技术培训师，可开发针对特定行业的AI命令行工具或提供Copilot CLI等工具的培训服务。切入点包括创建垂直领域命令行AI助手、开发命令行工具使用教程，或为企业提供AI工具集成培训。变现方式有工具销售、培训课程收费和企业服务合同，通过技术社区、开发者论坛和行业会议获客。这一方向受益于AI编程工具普及趋势，初期可从开源工具开发和免费教程内容积累用户开始。</p>
+          <div class="acc-footer"><span class="acc-tag">开发者工具/AI培训</span><a href="https://www.infoq.cn/article/NMxQFeHUc6EPw9QERWQj?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">多终端AI助手个性化定制</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">适合AI应用开发者和用户体验设计师，可为小米miclaw等多终端AI助手开发个性化技能或界面主题。切入点包括创建垂直场景AI对话技能、设计个性化助手交互界面，或为企业开发定制化AI助手集成方案。变现方式有技能商店销售分成、主题销售和企业定制开发费，通过应用商店和AI社区推广。这一方向受益于AI助手多终端扩展趋势，初期可从开发简单实用技能和免费主题积累用户开始。</p>
+          <div class="acc-footer"><span class="acc-tag">AI应用/个性化定制</span><a href="https://36kr.com/newsflashes/3775943297139461?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">05</span>
+          <span class="acc-text">AI数据库优化咨询服务</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">适合数据库管理员和AI技术顾问，可基于混元大模型等AI技术提供SQL自动调优和数据库性能优化服务。切入点包括开发轻量级SQL优化工具、提供数据库AI优化咨询服务，或为企业提供数据库智能化改造方案。变现方式有工具许可费、咨询服务费和性能优化分成，通过技术社区、行业会议和企业直接销售获客。这一方向契合企业数字化转型中数据库优化需求增长趋势，初期可从开源工具开发和免费咨询服务建立口碑开始。</p>
+          <div class="acc-footer"><span class="acc-tag">企业服务/AI+数据库</span><a href="https://www.infoq.cn/video/mMwbDBfQOpxCTvFkPhc1?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+  </main>
+</div>
+<footer>
+  <div class="footer-left">Joy 每日新闻播报 · 2026-04-21 · 星期二</div>
+  <div class="footer-right">Powered by DeepSeek</div>
+</footer>
+</body>
+</html>
