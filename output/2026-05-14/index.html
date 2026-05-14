@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joy 每日新闻播报 · 2026-05-14</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --bg2: #0f0f1a; --card: #13131f;
+      --border: #1e1e35; --border2: #252540;
+      --accent: #7c6aff; --cyan: #00e5ff; --pink: #ff6b9d;
+      --text: #e8e8f0; --muted: #6b6b8a; --muted2: #4a4a6a;
+      --radius-lg: 12px; --radius-md: 8px; --radius-sm: 5px;
+    }
+    body {
+      font-family: 'Noto Sans SC', 'Space Grotesk', -apple-system, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.7; font-size: 14px; -webkit-font-smoothing: antialiased;
+    }
+    header {
+      background: rgba(10,10,15,0.95); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border); height: 64px;
+      display: flex; align-items: center; padding: 0 2rem;
+      position: sticky; top: 0; z-index: 200;
+    }
+    header::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--cyan), var(--accent), transparent);
+    }
+    .header-inner {
+      max-width: 1240px; margin: 0 auto; width: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 8px;
+      border: 1px solid var(--border2); color: var(--muted);
+      text-decoration: none; transition: all 0.15s;
+    }
+    .back-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(124,106,255,0.08); }
+    .brand-mark {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent) 0%, #5b4fd4 100%);
+      border-radius: 9px; display: flex; align-items: center; justify-content: center;
+      font-size: 17px; box-shadow: 0 0 16px rgba(124,106,255,0.4); flex-shrink: 0;
+    }
+    .brand-name { font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: 0.3px; }
+    .brand-sub  { font-size: 0.62rem; color: var(--muted); letter-spacing: 3px; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 1.5rem; }
+    .header-date-block { text-align: right; }
+    .date-main { font-size: 0.88rem; font-weight: 600; color: var(--text); font-family: 'Space Grotesk', monospace; }
+    .date-week { font-size: 0.65rem; color: var(--muted); margin-top: 2px; letter-spacing: 2px; }
+    .header-divider { width: 1px; height: 28px; background: var(--border2); }
+    .header-tag {
+      font-size: 0.65rem; font-weight: 600; color: var(--cyan);
+      border: 1px solid rgba(0,229,255,0.3); background: rgba(0,229,255,0.06);
+      padding: 3px 10px; border-radius: 20px; letter-spacing: 2px;
+    }
+    .layout {
+      max-width: 1240px; margin: 1.75rem auto; padding: 0 1.5rem;
+      display: grid; grid-template-columns: 172px 1fr; gap: 1.5rem; align-items: start;
+    }
+    .sidenav {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1rem 0.75rem; position: sticky; top: 76px;
+    }
+    .sidenav-title {
+      font-size: 0.6rem; font-weight: 700; color: var(--muted2);
+      letter-spacing: 3px; text-transform: uppercase;
+      padding: 0 0.5rem 0.65rem; border-bottom: 1px solid var(--border); margin-bottom: 0.6rem;
+    }
+    .nav-link {
+      display: flex; align-items: center; gap: 8px; padding: 0.5rem 0.65rem;
+      border-radius: var(--radius-sm); font-size: 0.82rem; font-weight: 500;
+      color: var(--muted); text-decoration: none; transition: all 0.15s ease; margin-bottom: 2px;
+    }
+    .nav-link:hover { background: rgba(124,106,255,0.1); color: var(--accent); }
+    .nav-icon { font-size: 0.9rem; flex-shrink: 0; }
+    .main-content { display: flex; flex-direction: column; gap: 1.25rem; }
+    .section {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1.6rem 1.8rem; transition: border-color 0.2s;
+    }
+    .section:hover { border-color: var(--border2); }
+    .sec-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.3rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--border);
+    }
+    .sec-header-left { display: flex; align-items: center; gap: 9px; }
+    .sec-icon { font-size: 1.05rem; }
+    .sec-header h2 { font-size: 0.95rem; font-weight: 700; color: var(--text); letter-spacing: 0.5px; }
+    .sec-badge {
+      font-size: 0.65rem; font-weight: 600; color: var(--muted);
+      background: var(--bg2); border: 1px solid var(--border);
+      padding: 3px 11px; border-radius: 20px; letter-spacing: 1px;
+    }
+    .sub-block { margin-bottom: 1.3rem; }
+    .sub-block:last-child { margin-bottom: 0; }
+    .sub-label {
+      font-size: 0.62rem; font-weight: 700; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: 3px; margin-bottom: 0.8rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sub-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .insight-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.1rem; }
+    .insight-card {
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 1.1rem 1.2rem; background: var(--bg2);
+    }
+    .insight-card.accent-cyan  { background: rgba(0,229,255,0.04);  border-color: rgba(0,229,255,0.2); }
+    .insight-card.accent-pink  { background: rgba(255,107,157,0.04); border-color: rgba(255,107,157,0.2); }
+    .insight-label {
+      font-size: 0.68rem; font-weight: 700; color: var(--muted);
+      margin-bottom: 0.6rem; display: flex; align-items: center; gap: 6px; letter-spacing: 1px;
+    }
+    .insight-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .dot-purple { background: var(--accent); box-shadow: 0 0 6px rgba(124,106,255,0.6); }
+    .dot-cyan   { background: var(--cyan);   box-shadow: 0 0 6px rgba(0,229,255,0.6); }
+    .dot-pink   { background: var(--pink);   box-shadow: 0 0 6px rgba(255,107,157,0.6); }
+    .insight-text { font-size: 0.83rem; color: var(--muted); line-height: 1.85; }
+    details.acc-item > summary { list-style: none; }
+    details.acc-item > summary::-webkit-details-marker { display: none; }
+    .acc-item {
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      margin-bottom: 6px; overflow: hidden; transition: border-color 0.15s;
+    }
+    .acc-item:last-child { margin-bottom: 0; }
+    .acc-item:hover { border-color: var(--accent); }
+    .acc-title {
+      display: flex; align-items: center; gap: 12px; padding: 0.85rem 1.1rem;
+      background: var(--bg2); cursor: pointer; user-select: none;
+      -webkit-tap-highlight-color: transparent; transition: background 0.15s; width: 100%;
+    }
+    .acc-title:hover { background: rgba(124,106,255,0.06); }
+    details[open] > .acc-title { background: rgba(124,106,255,0.1); border-bottom: 1px solid var(--border); }
+    .acc-index {
+      font-size: 0.6rem; font-weight: 700; color: var(--accent);
+      background: rgba(124,106,255,0.12); border: 1px solid rgba(124,106,255,0.25);
+      padding: 2px 7px; border-radius: 4px; flex-shrink: 0; min-width: 28px; text-align: center;
+      font-family: 'Space Grotesk', monospace; transition: all 0.15s;
+    }
+    details[open] > .acc-title .acc-index {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+      box-shadow: 0 0 8px rgba(124,106,255,0.5);
+    }
+    .acc-text { flex: 1; font-size: 0.88rem; font-weight: 500; color: var(--text); line-height: 1.5; }
+    .acc-arrow {
+      color: var(--muted2); transition: transform 0.22s ease, color 0.15s;
+      flex-shrink: 0; display: flex; align-items: center;
+    }
+    details[open] > .acc-title .acc-arrow { transform: rotate(90deg); color: var(--accent); }
+    .acc-body {
+      padding: 1rem 1.1rem 1rem 3.1rem; background: var(--bg);
+      font-size: 0.85rem; color: var(--muted); line-height: 1.9;
+    }
+    .acc-summary { margin-bottom: 0.75rem; }
+    .acc-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .acc-tag {
+      display: inline-flex; align-items: center; font-size: 0.68rem; font-weight: 600;
+      color: var(--cyan); background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2);
+      padding: 2px 10px; border-radius: 4px; letter-spacing: 0.5px;
+    }
+    .acc-source-link {
+      display: inline-flex; align-items: center; font-size: 0.68rem; font-weight: 600;
+      color: var(--muted); text-decoration: none; background: var(--bg2);
+      border: 1px solid var(--border2); padding: 2px 10px; border-radius: 4px;
+      transition: color 0.15s, border-color 0.15s, background 0.15s; letter-spacing: 0.5px;
+    }
+    .acc-source-link:hover {
+      color: var(--accent); border-color: rgba(124,106,255,0.4); background: rgba(124,106,255,0.08);
+    }
+    .empty {
+      font-size: 0.82rem; color: var(--muted2); padding: 1.5rem 0;
+      text-align: center; border: 1px dashed var(--border);
+      border-radius: var(--radius-md); letter-spacing: 2px;
+    }
+    footer {
+      max-width: 1240px; margin: 0 auto 2.5rem; padding: 1.5rem 1.5rem 0;
+      border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-left  { font-size: 0.72rem; color: var(--muted2); letter-spacing: 1px; }
+    .footer-right {
+      font-size: 0.65rem; color: var(--accent); background: rgba(124,106,255,0.08);
+      border: 1px solid rgba(124,106,255,0.2); padding: 3px 12px; border-radius: 20px; letter-spacing: 1px;
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
+    @media (max-width: 768px) {
+      header { padding: 0 1rem; height: 56px; }
+      .header-divider, .header-tag { display: none; }
+      .layout { grid-template-columns: 1fr; margin: 1rem auto; padding: 0 0.75rem; gap: 0.85rem; }
+      .sidenav { position: static; display: flex; flex-wrap: wrap; gap: 6px; padding: 0.75rem; }
+      .sidenav-title { width: 100%; margin-bottom: 0.2rem; }
+      .nav-link { padding: 0.38rem 0.75rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; font-size: 0.78rem; }
+      .section { padding: 1rem; }
+      .insight-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+      .acc-title { padding: 0.9rem 1rem; }
+      .acc-body  { padding: 0.85rem 0.9rem 0.9rem 2.4rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.25rem 1rem 0; margin-bottom: 1.5rem; }
+    }
+    @media (max-width: 400px) {
+      .acc-text { font-size: 0.84rem; }
+      .section  { padding: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <a href="../" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div class="brand-mark">📡</div>
+      <div>
+        <div class="brand-name">Joy 每日新闻播报</div>
+        <div class="brand-sub">AI · TECH · INSIGHT</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-tag">DAILY BRIEFING</div>
+      <div class="header-divider"></div>
+      <div class="header-date-block">
+        <div class="date-main">2026-05-14</div>
+        <div class="date-week">星期四</div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidenav">
+    <div class="sidenav-title">栏目导航</div>
+    <a href="#sec-1" class="nav-link"><span class="nav-icon">🔮</span><span>要点整理</span></a><a href="#sec-2" class="nav-link"><span class="nav-icon">🏭</span><span>行业动态</span></a><a href="#sec-3" class="nav-link"><span class="nav-icon">💰</span><span>投资融资</span></a><a href="#sec-4" class="nav-link"><span class="nav-icon">⚡</span><span>技术突破</span></a><a href="#sec-5" class="nav-link"><span class="nav-icon">📦</span><span>产品上线</span></a><a href="#sec-6" class="nav-link"><span class="nav-icon">🎓</span><span>AI 教育</span></a><a href="#sec-7" class="nav-link"><span class="nav-icon">🚀</span><span>创业机会</span></a>
+  </nav>
+  <main class="main-content">
+    
+    <section class="section" id="sec-1">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">🔮</span><h2>要点整理</h2></div>
+        <span class="sec-badge">今日收录 81 篇</span>
+      </div>
+      <div class="sub-block">
+        <div class="sub-label">今日新闻摘录</div>
+        
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">前阿里Qwen负责人林俊旸再创业，新AI Lab估值136亿元</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">前阿里千问大模型技术负责人林俊旸近期开启创业，方向包括世界模型和具身大脑。林俊旸已招募数名字节、腾讯和海外背景的成员，并以约20亿美金（约136亿元）估值开启融资。这标志着顶级AI人才持续涌入创业赛道，中国AI创投热度不减。</p>
+          <div class="acc-footer"><a href="https://www.infoq.cn/article/OpaYcpzKc45zmvxCNBlW?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">黄仁勋最后一刻登上访华飞机，英伟达中国市场再添变量</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">英伟达CEO黄仁勋在最后一刻登上访华飞机，参加中美元首会谈。此前黄仁勋等十余名美商界代表进入会谈现场，凸显半导体巨头对中国市场的重视。此举可能影响英伟达对华芯片出口政策，为中美科技博弈增添新变量。</p>
+          <div class="acc-footer"><a href="https://www.infoq.cn/article/6a5AKza2aj5FKSYVx76D?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">谷歌 DORA 团队发布新报告：扎实的工程基础决定了 AI 投资回报</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">谷歌DORA团队发布报告，指出扎实的工程基础是决定AI投资回报的关键因素。报告强调，企业在AI投入前须夯实基础设施和工程实践，否则难以获得预期收益。这为众多盲目跟风AI的企业敲响警钟，建议优先优化工程能力。</p>
+          <div class="acc-footer"><a href="https://www.infoq.cn/article/IgGuKFh9qmKmFEIZeR4t?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">十余名美商界代表进入中美元首会谈现场</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">5月14日上午，特斯拉CEO马斯克、苹果CEO库克、英伟达CEO黄仁勋等十余名美商界代表进入中美元首会谈现场。此举展示美国科技巨头对中美关系的关注，也暗示商业利益在双边谈判中的关键作用。会谈可能推动经贸合作与科技交流。</p>
+          <div class="acc-footer"><a href="https://36kr.com/newsflashes/3808586952253184?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">05</span>
+          <span class="acc-text">习近平：中美经贸关系的本质是互利共赢</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">习近平在中美元首会谈中指出，贸易战没有赢家，中美经贸关系本质是互利共赢。双方经贸团队已达成总体平衡积极的成果，对两国和世界都是好消息。这为中美科技企业合作释放积极信号，有望缓解市场对科技脱钩的担忧。</p>
+          <div class="acc-footer"><a href="https://36kr.com/newsflashes/3808570559651591?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">06</span>
+          <span class="acc-text">阿里企业级 Agent 平台“悟空”开始逐步规模化放量</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">阿里巴巴财报显示，企业级Agent平台“悟空”已进入规模化放量阶段，标志着阿里AI从投入期转入商业回报期。悟空平台帮助企业构建AI助手，降低Agent开发门槛。此举将加速企业AI落地，推动智能体应用普及。</p>
+          <div class="acc-footer"><a href="https://36kr.com/newsflashes/3808534651313927?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">07</span>
+          <span class="acc-text">台积电预计到2030年全球芯片市场规模将超过1.5万亿美元</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">台积电在技术研讨会上预测，2030年全球半导体市场规模将超1.5万亿美元，AI和高性能计算占比55%。台积电计划在2026年建设九期晶圆厂和先进封装设施，加速产能扩张。这反映AI对芯片需求的强劲驱动，半导体上游景气度持续提升。</p>
+          <div class="acc-footer"><a href="https://36kr.com/newsflashes/3808528436764421?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      </div>
+      <div class="insight-grid">
+        <div class="insight-card">
+          <div class="insight-label"><span class="insight-dot dot-purple"></span>跨板块关联</div>
+          <div class="insight-text">今日多条新闻围绕中美科技博弈与AI商业落地展开。美商界代表参与中美元首会谈，反映科技巨头对市场稳定的诉求；黄仁勋访华、台积电扩大产能，显示半导体行业对AI需求的信心。阿里悟空平台放量、谷歌DORA报告则强调工程基础对AI回报的重要性。</div>
+        </div>
+        <div class="insight-card accent-cyan">
+          <div class="insight-label"><span class="insight-dot dot-cyan"></span>创业方向建议</div>
+          <div class="insight-text">创业者可聚焦AI Agent基础设施领域，如企业级Agent平台、云原生服务。同时关注中美科技合作带来的跨境机遇，如半导体设备、EDA工具等国产替代方向。建议夯实工程基础，避免盲目追热点。</div>
+        </div>
+        <div class="insight-card accent-pink">
+          <div class="insight-label"><span class="insight-dot dot-pink"></span>风险预警</div>
+          <div class="insight-text">中美科技博弈存在不确定性，半导体出口管制可能收紧。AI投资回报受工程基础制约，企业不应盲目投入。此外，Meta AI账户不可屏蔽引发隐私争议，AI产品需注重合规与用户权益。</div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="section" id="sec-2">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">🏭</span><h2>行业动态</h2></div>
+        <span class="sec-badge">9 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">字节跳动、上汽等入股自变量机器人</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">自变量科技（深圳）有限公司发生工商变更，新增字节跳动旗下北京量子跃动科技有限公司、上汽集团旗下上海上汽创远创业投资合伙企业等为股东。自变量机器人专注具身智能领域，此次融资后注册资本增加。字节和上汽的入股显示产业资本看好机器人赛道。</p>
+          <div class="acc-footer"><span class="acc-tag">字节跳动、上汽集团</span><a href="https://36kr.com/newsflashes/3808616341331718?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">Netflix 推出“模型生命周期图”，扩展企业级机器学习</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">Netflix发布“模型生命周期图”工具，帮助企业级机器学习团队管理模型从开发到部署的全流程。该工具覆盖数据准备、训练、评估、部署等环节，提升模型治理效率。Netflix通过开放内部工具，推动企业MLOps标准化。</p>
+          <div class="acc-footer"><span class="acc-tag">Netflix</span><a href="https://www.infoq.cn/article/omIEI3rqzgXWJOHiHMWU?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">GitHub 如何保障现代CI/CD系统中智能体工作流的安全</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">GitHub分享在CI/CD系统中保障智能体工作流安全的最佳实践，包括代码审查、权限控制、行为监控等措施。随着AI agent自动生成代码，安全风险增加，GitHub的方案为行业提供参考。这有助于企业安全地采用AI辅助开发。</p>
+          <div class="acc-footer"><span class="acc-tag">GitHub</span><a href="https://www.infoq.cn/article/ACTA4vlLcqBOTu5vw2cR?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">百度给出 Agent 时代系统答案：从自我进化到DAA</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">百度提出从自我进化到DAA（数据、算法、架构）的Agent系统方案，强调系统化构建智能体。该方案整合百度在AI领域的积累，旨在降低Agent开发复杂度。百度此举意在抢占Agent平台市场，推动智能体在各行业落地。</p>
+          <div class="acc-footer"><span class="acc-tag">百度</span><a href="https://www.infoq.cn/article/aaLabGa4T7z5m1UBiJ2O?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">05</span>
+          <span class="acc-text">MediaTek 发布 AI 与游戏开发新工具，聚焦端侧智能体与移动图形能力</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">MediaTek推出AI与游戏开发新工具，重点支持端侧智能体部署和移动图形渲染。该工具针对移动端优化，降低开发者利用端侧AI的门槛。MediaTek通过工具链布局，巩固其在移动芯片市场的竞争力。</p>
+          <div class="acc-footer"><span class="acc-tag">MediaTek</span><a href="https://www.infoq.cn/article/i1arV0AXjw1xSdXt3kzv?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">06</span>
+          <span class="acc-text">Meta 禁止用户在 Threads 上屏蔽其 AI 账户</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">Meta宣布用户无法在Threads上屏蔽其官方AI账户，引发隐私争议。Meta此举旨在推广AI功能，但用户担忧个人数据被滥用。该决策违反部分用户的自主权，可能面临监管挑战。</p>
+          <div class="acc-footer"><span class="acc-tag">Meta</span><a href="https://www.theverge.com/tech/929091/meta-ai-threads-account-block" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">07</span>
+          <span class="acc-text">Cloudflare 推出 Artifacts Beta 测试版，为 AI 代理引入类似 Git 的版本控制功能</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">Cloudflare发布Artifacts Beta，为AI代理提供类似Git的版本控制能力，支持管理AI工作流的不同版本。该工具帮助开发者追踪变更、回滚错误，提升AI应用可靠性。Cloudflare以基础设施服务切入AI开发工具市场。</p>
+          <div class="acc-footer"><span class="acc-tag">Cloudflare</span><a href="https://www.infoq.cn/article/ULPBgiEHyo3i9OCTrgr9?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">08</span>
+          <span class="acc-text">思科宣布裁员</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">思科发布未来路径声明，确认将进行裁员，但未公布具体人数。思科面临网络设备需求放缓，通过裁员以优化成本。这反映传统IT企业在AI时代转型压力增大。</p>
+          <div class="acc-footer"><span class="acc-tag">Cisco</span><a href="https://blogs.cisco.com/news/our-path-forward" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">09</span>
+          <span class="acc-text">韩国要求三星与工会5月16日恢复谈判</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">韩国国家劳动关系委员会要求三星电子与工会于16日恢复谈判，以避免罢工。韩国企划财政部警告，三星罢工将对经济、出口和金融市场构成重大风险。三星劳资纠纷若升级，可能影响全球芯片供应。</p>
+          <div class="acc-footer"><span class="acc-tag">三星</span><a href="https://36kr.com/newsflashes/3808578276761345?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-3">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">💰</span><h2>投资融资</h2></div>
+        <span class="sec-badge">4 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">前阿里Qwen负责人林俊旸再创业，新AI Lab估值136亿元</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">前阿里千问大模型负责人林俊旸创业，公司估值约20亿美金，方向包括世界模型和具身大脑。林俊旸已招募字节、腾讯背景成员，接触红杉中国、高榕创投等基金。高估值反映资本对顶尖AI人才的追捧，也凸显行业对世界模型赛道的期待。</p>
+          <div class="acc-footer"><span class="acc-tag">20亿美元估值</span><a href="https://36kr.com/p/3808362853834502?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">36氪首发 | 九号领投一家AI智能影像设备公司，在巨头夹缝中年增长近4倍</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">智能体育影像品牌XbotGo完成近亿元融资，由九号资本领投，元禾控股等跟投。该公司专注AI自动跟踪拍摄设备，解决家长拍摄青少年运动痛点。年增长近4倍，证明细分市场潜力巨大。</p>
+          <div class="acc-footer"><span class="acc-tag">近亿元</span><a href="https://36kr.com/p/3807831328300549?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">字节跳动、上汽等入股自变量机器人</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">自变量科技获字节跳动、上汽集团入股，注册资本增至约115万人民币。自变量机器人专注具身智能，此次融资后股东阵容强大。产业资本入局将加速具身智能技术落地和商业化。</p>
+          <div class="acc-footer"><span class="acc-tag">未披露</span><a href="https://36kr.com/newsflashes/3808616341331718?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">30万亿细胞迷宫里寻路，MIT博士7年跑出一家上市公司</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">剂泰科技登陆港交所，开盘涨170%，市值超270亿港币。公司由MIT博士赖才达创立，专注AI药物递送系统。香港公开发售超购6900倍，显示资本市场对AI制药的高度兴趣。</p>
+          <div class="acc-footer"><span class="acc-tag">超270亿港币市值</span><a href="https://36kr.com/p/3807162054106624?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-4">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">⚡</span><h2>技术突破</h2></div>
+        <span class="sec-badge">6 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">智能体成新型攻击入口？模型上线前OpenAI内部到底审什么？董事会成员首次详解</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">OpenAI董事会成员首次详解模型上线前内部安全审查流程，强调智能体可能成为新型攻击入口。OpenAI在发布前进行多维评估，包括对抗测试和伦理审查。此举提高AI安全透明度，为行业树立安全规范。</p>
+          <div class="acc-footer"><a href="https://www.infoq.cn/article/9lIsQifBWYzKi9j3D88I?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">挑战扩散自回归统治！字节提出视觉生成第三种路线，让模型像人类一样边画边改</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">字节跳动提出视觉生成第三种路线，使模型能像人类一样边画边改，同参数下超越扩散自回归模型。该方法在图像质量与生成效率上取得平衡，为AI绘画提供新思路。字节此举有望推动视觉生成技术创新。</p>
+          <div class="acc-footer"><a href="https://www.qbitai.com/2026/05/416978.html" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">Waymo CEO回应L2升维L4：有可能，但只靠端到端还不够</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">Waymo CEO表示L2级辅助驾驶升级到L4级自动驾驶是可能的，但仅靠端到端学习不够，需要云端基模蒸馏上车和语言对齐世界模型。Waymo强调系统化方法，兼顾感知与决策安全。这为自动驾驶行业指明技术演进路径。</p>
+          <div class="acc-footer"><a href="https://www.qbitai.com/2026/05/417469.html" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">把 RAG 做成主流的公司，现在开始“做空”RAG 了</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">RAG技术公司开始质疑RAG的局限性，认为单纯RAG无法满足复杂推理需求，转向更智能的检索生成架构。RAG虽成主流，但面临幻觉和知识更新问题。这一反思推动AI技术向更高级别的知识融合演进。</p>
+          <div class="acc-footer"><a href="https://www.infoq.cn/article/KKa2KiT9BxipQtZTZG79?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">05</span>
+          <span class="acc-text">6 天、96 万行 Rust、直接合并？Claude Code 被 Bun 的内存泄漏拖垮后，Bun 让 Claude 亲手重写了自己</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">JavaScript运行时Bun因内存泄漏问题，要求Claude Code在6天内用Rust重写了96万行代码。AI协助大规模重构的案例展示AI代码生成能力，也暴露AI代码质量风险。此举引发对AI辅助重构效率与可靠性的讨论。</p>
+          <div class="acc-footer"><a href="https://www.infoq.cn/article/r63e4S6ZyxrGjfIOV96v?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">06</span>
+          <span class="acc-text">摩尔线程 MUSA 合入SGLang主线，国产GPU开源生态从“代码共建”迈入“原生支持时代”</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">摩尔线程MUSA架构合入大模型推理框架SGLang主线，实现国产GPU原生支持。这意味着开发者可直接在摩尔线程GPU上运行SGLang，无需额外适配。此举降低国产AI芯片开发门槛，推动国产GPU生态繁荣。</p>
+          <div class="acc-footer"><a href="https://www.infoq.cn/article/fiAgqOKzER2JCqcLXMuW?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-5">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">📦</span><h2>产品上线</h2></div>
+        <span class="sec-badge">4 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">Claude for Small Business 发布</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">Anthropic推出Claude for Small Business服务，为中小企业提供定制化AI助手。该服务针对小微企业需求，简化部署流程，降低使用门槛。此举有助于扩大Claude在企业市场的渗透率，与ChatGPT竞争企业客户。</p>
+          <div class="acc-footer"><span class="acc-tag">Claude for Small Business</span><a href="https://www.anthropic.com/news/claude-for-small-business" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">8岁小学生idea直接变应用，秒哒3.0刚刚把AI应用门槛打没了</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">秒哒发布3.0版本，支持用户通过自然语言描述直接生成应用，甚至可在手机上完成。8岁小学生也能将自己的想法变成APP，极大降低开发门槛。该平台推动AI应用民主化，让非程序员也能创建工具。</p>
+          <div class="acc-footer"><span class="acc-tag">秒哒3.0</span><a href="https://www.qbitai.com/2026/05/417366.html" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">TikTok在印尼、美国、日本三国官宣生活服务品牌TikTok GO</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">TikTok宣布在印尼、美国、日本推出生活服务品牌TikTok GO，拓展本地生活业务。TikTok GO整合线上营销与线下服务，为用户提供团购、外卖等。此举对标美团等本地服务平台，利用流量优势切入新赛道。</p>
+          <div class="acc-footer"><span class="acc-tag">TikTok GO</span><a href="https://36kr.com/p/3808362853834502?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">Manus 交易失败后，创始人仍在谈论 Agent 时代的成功经验</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">AI代理平台Manus尽管交易失败，但其创始人仍分享Agent时代创业心得，强调专注垂直场景和用户体验。Manus经历显示Agent赛道竞争激烈，但需求明确。创始人的复盘为后来者提供宝贵经验。</p>
+          <div class="acc-footer"><span class="acc-tag">Manus</span><a href="https://www.infoq.cn/article/bqjNfpZk9b3UoVXav3ee?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-6">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">🎓</span><h2>AI 教育资讯</h2></div>
+        <span class="sec-badge">1 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">倒计时一周，AIGC峰会嘉宾又上新了！一起来看第三波嘉宾</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">AIGC峰会将于5月20日举行，第三波嘉宾名单公布，涵盖行业专家与创业者。峰会聚焦生成式AI最新趋势与实践，提供学习交流平台。参会者可了解前沿技术，拓展人脉，适合AI从业者和学习者。</p>
+          <div class="acc-footer"><a href="https://www.qbitai.com/2026/05/417447.html" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-7">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">🚀</span><h2>创业机会</h2></div>
+        <span class="sec-badge">5 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">AI体育影像副业：为青少年运动比赛提供自动跟拍服务</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">XbotGo等AI智能影像设备可自动拍摄青少年比赛视频，家长对记录孩子运动表现需求旺盛。普通人可购置设备，为社区比赛提供拍摄服务，按场次收费。也可将视频剪辑后通过社交媒体变现，单场收入可达数百元。</p>
+          <div class="acc-footer"><span class="acc-tag">AI+体育服务</span><a href="https://36kr.com/p/3807831328300549?f=rss" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">零代码AI应用开发：利用秒哒3.0为小企业定制工具</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">秒哒3.0让无编程经验者通过对话生成APP。普通人可为本地小商户（如餐馆、理发店）开发预约、点单等简单应用，收取开发费或按使用收费。市场对轻量级定制化工具需求旺盛，单个应用开发费可达数千元。</p>
+          <div class="acc-footer"><span class="acc-tag">AI应用开发</span><a href="https://www.qbitai.com/2026/05/417366.html" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">AI安全教育顾问：帮助企业应对智能体安全风险</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">随着AI Agent成为新型攻击入口，企业急需安全培训。了解OpenAI安全审查框架等知识后，可为企业提供AI安全审计、员工培训服务。AI安全咨询按项目收费，市场处于早期，机会较大。</p>
+          <div class="acc-footer"><span class="acc-tag">AI安全咨询</span><a href="https://www.infoq.cn/article/9lIsQifBWYzKi9j3D88I?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">AI编程辅助：利用Claude Code重构或开发小程序</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">Bun使用Claude Code重写代码案例展示AI辅助编程的潜力。懂基础编程的人可接单为小企业重构遗留系统或开发小程序，利用AI加速开发。单项目报价可从几千到几万不等，需注意代码质量控制。</p>
+          <div class="acc-footer"><span class="acc-tag">AI辅助编程</span><a href="https://www.infoq.cn/article/r63e4S6ZyxrGjfIOV96v?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">05</span>
+          <span class="acc-text">AI游戏开发教程制作：基于MediaTek新工具制作端侧AI游戏</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">MediaTek发布AI与游戏开发新工具，支持端侧智能体。了解该工具后，可制作教程视频或开设在线课程，教授游戏开发者如何利用端侧AI。课程可通过知识付费平台销售，或接企业内训，收入可观。</p>
+          <div class="acc-footer"><span class="acc-tag">AI游戏开发教育</span><a href="https://www.infoq.cn/article/i1arV0AXjw1xSdXt3kzv?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+  </main>
+</div>
+<footer>
+  <div class="footer-left">Joy 每日新闻播报 · 2026-05-14 · 星期四</div>
+  <div class="footer-right">Powered by DeepSeek</div>
+</footer>
+</body>
+</html>
