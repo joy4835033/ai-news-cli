@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joy 每日新闻播报 · 2026-09-07</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --bg2: #0f0f1a; --card: #13131f;
+      --border: #1e1e35; --border2: #252540;
+      --accent: #7c6aff; --cyan: #00e5ff; --pink: #ff6b9d;
+      --text: #e8e8f0; --muted: #6b6b8a; --muted2: #4a4a6a;
+      --radius-lg: 12px; --radius-md: 8px; --radius-sm: 5px;
+    }
+    body {
+      font-family: 'Noto Sans SC', 'Space Grotesk', -apple-system, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.7; font-size: 14px; -webkit-font-smoothing: antialiased;
+    }
+    header {
+      background: rgba(10,10,15,0.95); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border); height: 64px;
+      display: flex; align-items: center; padding: 0 2rem;
+      position: sticky; top: 0; z-index: 200;
+    }
+    header::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--cyan), var(--accent), transparent);
+    }
+    .header-inner {
+      max-width: 1240px; margin: 0 auto; width: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 8px;
+      border: 1px solid var(--border2); color: var(--muted);
+      text-decoration: none; transition: all 0.15s;
+    }
+    .back-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(124,106,255,0.08); }
+    .brand-mark {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent) 0%, #5b4fd4 100%);
+      border-radius: 9px; display: flex; align-items: center; justify-content: center;
+      font-size: 17px; box-shadow: 0 0 16px rgba(124,106,255,0.4); flex-shrink: 0;
+    }
+    .brand-name { font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: 0.3px; }
+    .brand-sub  { font-size: 0.62rem; color: var(--muted); letter-spacing: 3px; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 1.5rem; }
+    .header-date-block { text-align: right; }
+    .date-main { font-size: 0.88rem; font-weight: 600; color: var(--text); font-family: 'Space Grotesk', monospace; }
+    .date-week { font-size: 0.65rem; color: var(--muted); margin-top: 2px; letter-spacing: 2px; }
+    .header-divider { width: 1px; height: 28px; background: var(--border2); }
+    .header-tag {
+      font-size: 0.65rem; font-weight: 600; color: var(--cyan);
+      border: 1px solid rgba(0,229,255,0.3); background: rgba(0,229,255,0.06);
+      padding: 3px 10px; border-radius: 20px; letter-spacing: 2px;
+    }
+    .layout {
+      max-width: 1240px; margin: 1.75rem auto; padding: 0 1.5rem;
+      display: grid; grid-template-columns: 172px 1fr; gap: 1.5rem; align-items: start;
+    }
+    .sidenav {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1rem 0.75rem; position: sticky; top: 76px;
+    }
+    .sidenav-title {
+      font-size: 0.6rem; font-weight: 700; color: var(--muted2);
+      letter-spacing: 3px; text-transform: uppercase;
+      padding: 0 0.5rem 0.65rem; border-bottom: 1px solid var(--border); margin-bottom: 0.6rem;
+    }
+    .nav-link {
+      display: flex; align-items: center; gap: 8px; padding: 0.5rem 0.65rem;
+      border-radius: var(--radius-sm); font-size: 0.82rem; font-weight: 500;
+      color: var(--muted); text-decoration: none; transition: all 0.15s ease; margin-bottom: 2px;
+    }
+    .nav-link:hover { background: rgba(124,106,255,0.1); color: var(--accent); }
+    .nav-icon { font-size: 0.9rem; flex-shrink: 0; }
+    .main-content { display: flex; flex-direction: column; gap: 1.25rem; }
+    .section {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1.6rem 1.8rem; transition: border-color 0.2s;
+    }
+    .section:hover { border-color: var(--border2); }
+    .sec-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.3rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--border);
+    }
+    .sec-header-left { display: flex; align-items: center; gap: 9px; }
+    .sec-icon { font-size: 1.05rem; }
+    .sec-header h2 { font-size: 0.95rem; font-weight: 700; color: var(--text); letter-spacing: 0.5px; }
+    .sec-badge {
+      font-size: 0.65rem; font-weight: 600; color: var(--muted);
+      background: var(--bg2); border: 1px solid var(--border);
+      padding: 3px 11px; border-radius: 20px; letter-spacing: 1px;
+    }
+    .sub-block { margin-bottom: 1.3rem; }
+    .sub-block:last-child { margin-bottom: 0; }
+    .sub-label {
+      font-size: 0.62rem; font-weight: 700; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: 3px; margin-bottom: 0.8rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sub-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .insight-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.1rem; }
+    .insight-card {
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 1.1rem 1.2rem; background: var(--bg2);
+    }
+    .insight-card.accent-cyan  { background: rgba(0,229,255,0.04);  border-color: rgba(0,229,255,0.2); }
+    .insight-card.accent-pink  { background: rgba(255,107,157,0.04); border-color: rgba(255,107,157,0.2); }
+    .insight-label {
+      font-size: 0.68rem; font-weight: 700; color: var(--muted);
+      margin-bottom: 0.6rem; display: flex; align-items: center; gap: 6px; letter-spacing: 1px;
+    }
+    .insight-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .dot-purple { background: var(--accent); box-shadow: 0 0 6px rgba(124,106,255,0.6); }
+    .dot-cyan   { background: var(--cyan);   box-shadow: 0 0 6px rgba(0,229,255,0.6); }
+    .dot-pink   { background: var(--pink);   box-shadow: 0 0 6px rgba(255,107,157,0.6); }
+    .insight-text { font-size: 0.83rem; color: var(--muted); line-height: 1.85; }
+    details.acc-item > summary { list-style: none; }
+    details.acc-item > summary::-webkit-details-marker { display: none; }
+    .acc-item {
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      margin-bottom: 6px; overflow: hidden; transition: border-color 0.15s;
+    }
+    .acc-item:last-child { margin-bottom: 0; }
+    .acc-item:hover { border-color: var(--accent); }
+    .acc-title {
+      display: flex; align-items: center; gap: 12px; padding: 0.85rem 1.1rem;
+      background: var(--bg2); cursor: pointer; user-select: none;
+      -webkit-tap-highlight-color: transparent; transition: background 0.15s; width: 100%;
+    }
+    .acc-title:hover { background: rgba(124,106,255,0.06); }
+    details[open] > .acc-title { background: rgba(124,106,255,0.1); border-bottom: 1px solid var(--border); }
+    .acc-index {
+      font-size: 0.6rem; font-weight: 700; color: var(--accent);
+      background: rgba(124,106,255,0.12); border: 1px solid rgba(124,106,255,0.25);
+      padding: 2px 7px; border-radius: 4px; flex-shrink: 0; min-width: 28px; text-align: center;
+      font-family: 'Space Grotesk', monospace; transition: all 0.15s;
+    }
+    details[open] > .acc-title .acc-index {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+      box-shadow: 0 0 8px rgba(124,106,255,0.5);
+    }
+    .acc-text { flex: 1; font-size: 0.88rem; font-weight: 500; color: var(--text); line-height: 1.5; }
+    .acc-arrow {
+      color: var(--muted2); transition: transform 0.22s ease, color 0.15s;
+      flex-shrink: 0; display: flex; align-items: center;
+    }
+    details[open] > .acc-title .acc-arrow { transform: rotate(90deg); color: var(--accent); }
+    .acc-body {
+      padding: 1rem 1.1rem 1rem 3.1rem; background: var(--bg);
+      font-size: 0.85rem; color: var(--muted); line-height: 1.9;
+    }
+    .acc-summary { margin-bottom: 0.75rem; }
+    .acc-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .acc-tag {
+      display: inline-flex; align-items: center; font-size: 0.68rem; font-weight: 600;
+      color: var(--cyan); background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2);
+      padding: 2px 10px; border-radius: 4px; letter-spacing: 0.5px;
+    }
+    .acc-source-link {
+      display: inline-flex; align-items: center; font-size: 0.68rem; font-weight: 600;
+      color: var(--muted); text-decoration: none; background: var(--bg2);
+      border: 1px solid var(--border2); padding: 2px 10px; border-radius: 4px;
+      transition: color 0.15s, border-color 0.15s, background 0.15s; letter-spacing: 0.5px;
+    }
+    .acc-source-link:hover {
+      color: var(--accent); border-color: rgba(124,106,255,0.4); background: rgba(124,106,255,0.08);
+    }
+    .empty {
+      font-size: 0.82rem; color: var(--muted2); padding: 1.5rem 0;
+      text-align: center; border: 1px dashed var(--border);
+      border-radius: var(--radius-md); letter-spacing: 2px;
+    }
+    footer {
+      max-width: 1240px; margin: 0 auto 2.5rem; padding: 1.5rem 1.5rem 0;
+      border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-left  { font-size: 0.72rem; color: var(--muted2); letter-spacing: 1px; }
+    .footer-right {
+      font-size: 0.65rem; color: var(--accent); background: rgba(124,106,255,0.08);
+      border: 1px solid rgba(124,106,255,0.2); padding: 3px 12px; border-radius: 20px; letter-spacing: 1px;
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
+    @media (max-width: 768px) {
+      header { padding: 0 1rem; height: 56px; }
+      .header-divider, .header-tag { display: none; }
+      .layout { grid-template-columns: 1fr; margin: 1rem auto; padding: 0 0.75rem; gap: 0.85rem; }
+      .sidenav { position: static; display: flex; flex-wrap: wrap; gap: 6px; padding: 0.75rem; }
+      .sidenav-title { width: 100%; margin-bottom: 0.2rem; }
+      .nav-link { padding: 0.38rem 0.75rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; font-size: 0.78rem; }
+      .section { padding: 1rem; }
+      .insight-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+      .acc-title { padding: 0.9rem 1rem; }
+      .acc-body  { padding: 0.85rem 0.9rem 0.9rem 2.4rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.25rem 1rem 0; margin-bottom: 1.5rem; }
+    }
+    @media (max-width: 400px) {
+      .acc-text { font-size: 0.84rem; }
+      .section  { padding: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <a href="../" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div class="brand-mark">📡</div>
+      <div>
+        <div class="brand-name">Joy 每日新闻播报</div>
+        <div class="brand-sub">AI · TECH · INSIGHT</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-tag">DAILY BRIEFING</div>
+      <div class="header-divider"></div>
+      <div class="header-date-block">
+        <div class="date-main">2026-09-07</div>
+        <div class="date-week">星期一</div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidenav">
+    <div class="sidenav-title">栏目导航</div>
+    <a href="#sec-1" class="nav-link"><span class="nav-icon">🔮</span><span>要点整理</span></a><a href="#sec-2" class="nav-link"><span class="nav-icon">🏭</span><span>行业动态</span></a><a href="#sec-3" class="nav-link"><span class="nav-icon">💰</span><span>投资融资</span></a><a href="#sec-4" class="nav-link"><span class="nav-icon">⚡</span><span>技术突破</span></a><a href="#sec-5" class="nav-link"><span class="nav-icon">📦</span><span>产品上线</span></a><a href="#sec-6" class="nav-link"><span class="nav-icon">🎓</span><span>AI 教育</span></a><a href="#sec-7" class="nav-link"><span class="nav-icon">🚀</span><span>创业机会</span></a>
+  </nav>
+  <main class="main-content">
+    
+    <section class="section" id="sec-1">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">🔮</span><h2>要点整理</h2></div>
+        <span class="sec-badge">今日收录 27 篇</span>
+      </div>
+      <div class="sub-block">
+        <div class="sub-label">今日新闻摘录</div>
+        
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">Nitter和XCancel在法律建议后恢复服务</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">Nitter和XCancel在获得法律建议后恢复服务。这两个工具曾因法律问题暂停，但现在已重新上线。此举对依赖这些服务的用户来说是个好消息，表明在法律合规的前提下，它们可以继续运作。</p>
+          <div class="acc-footer"><a href="https://github.com/zedeus/nitter/commit/1428b4c2b4246f92a7e5b2673438e5fb39fcc4a3" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">你的智力拉链开着：用LLM写文章时的智力暴露</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">布赖恩·坎特里尔发文指出，使用大型语言模型（LLM）撰写文章可能会无意中暴露作者的智力缺陷。他认为，过度依赖AI会削弱独立思考能力。文章引发了关于AI写作伦理的广泛讨论，提醒人们在使用AI时保持批判性。</p>
+          <div class="acc-footer"><a href="https://bcantrill.dtrace.org/2025/12/05/your-intellectual-fly-is-open/" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">OpenAI发布研究加速：内部视角</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">OpenAI发布了关于研究加速的深度文章，揭示了其内部如何快速推进人工智能研究。文章强调了研究团队的组织方式和创新文化。这显示了OpenAI在AI领域的领先地位，并可能为其他研究机构提供借鉴。</p>
+          <div class="acc-footer"><a href="https://openai.com/index/research-acceleration-view-inside-openai" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">Asahi Linux正式支持M3芯片</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">Asahi Linux团队宣布其系统现已正式支持Apple M3芯片，实现了对最新硬件的适配。此前，该团队已成功支持M1和M2芯片，此次扩展进一步巩固了Linux在Apple Silicon上的可用性。对于希望使用Linux的M3用户来说，这是一个重要里程碑。</p>
+          <div class="acc-footer"><a href="https://asahilinux.org/2026/09/m2-episode-1/" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">05</span>
+          <span class="acc-text">GrapheneOS重构默认应用和安全剪贴板</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">GrapheneOS对其默认应用和安全剪贴板进行了全面改进，提升了隐私保护和安全性。改进后的剪贴板会限制应用对敏感数据的访问。此举增强了GrapheneOS作为注重隐私的安卓替代品的吸引力。</p>
+          <div class="acc-footer"><a href="https://grapheneos.social/@GrapheneOS/117225539756835649" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">06</span>
+          <span class="acc-text">用1024字节编写Python解释器</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">奥斯汀·亨利展示了如何用极小的代码量实现一个可用的Python解释器，该解释器仅占1024字节。这一创举展示了编程技巧和计算机科学的精妙。对于开发者来说，这是一个极具启发性的项目，有助于理解解释器的基本工作原理。</p>
+          <div class="acc-footer"><a href="https://austinhenley.com/blog/python1024.html" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      </div>
+      <div class="insight-grid">
+        <div class="insight-card">
+          <div class="insight-label"><span class="insight-dot dot-purple"></span>跨板块关联</div>
+          <div class="insight-text">AI治理和运行时执行与开源工具恢复服务表明AI应用正走向合规与落地，传统企业转型和机器人上下文学习则显示AI正在向行业纵深渗透。</div>
+        </div>
+        <div class="insight-card accent-cyan">
+          <div class="insight-label"><span class="insight-dot dot-cyan"></span>创业方向建议</div>
+          <div class="insight-text">针对AI治理、模型路由器、小型工具集，可提供咨询或托管服务，也可开发垂直行业AI应用。</div>
+        </div>
+        <div class="insight-card accent-pink">
+          <div class="insight-label"><span class="insight-dot dot-pink"></span>风险预警</div>
+          <div class="insight-text">AI治理从政策转向执行，企业可能面临合规风险；依赖LLM写作可能暴露智力缺陷，需防范AI内容失真。</div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="section" id="sec-2">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">🏭</span><h2>行业动态</h2></div>
+        <span class="sec-badge">5 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">微软将人工智能治理从政策层面转向运行时执行</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">微软正在将人工智能治理从理论政策转向运行时执行，这意味着AI系统在实际运行中会受到更严格的监控和管理。这一转变反映了业界对AI安全性和责任感的日益重视。微软的这一举措可能会推动整个行业采用更严格的AI治理实践。</p>
+          <div class="acc-footer"><span class="acc-tag">微软</span><a href="https://www.infoq.cn/article/STpCLL13xCQsoYrfWSLb?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">传统企业AI转型的最短路径，藏在研发部门</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">文章指出，传统企业进行AI转型的最佳切入点是研发部门，因为这里集中了数据和技术高手。通过研发部门的试点项目，企业可以验证AI技术的价值，然后逐步扩展到其他部门。这一路径能降低转型风险，提高成功率。</p>
+          <div class="acc-footer"><span class="acc-tag">传统企业</span><a href="https://www.infoq.cn/article/jrEuCFhtpA9LmGX60R1H?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">微软Foundry模型路由扩容：覆盖区域增至28个，更新模型池</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">微软的Foundry模型路由服务扩展至28个区域，并更新了模型池。这一升级意味着更多的开发者和企业可以在更多地区使用到最新的AI模型。微软此举旨在提升其AI服务的可用性和灵活性，以应对日益增长的需求。</p>
+          <div class="acc-footer"><span class="acc-tag">微软</span><a href="https://www.infoq.cn/article/ba7Tq1EZbAD6JEzG16uE?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">04</span>
+          <span class="acc-text">具身ICL来了创业玩家！上下文成Scaling新赛道</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">具身智能中的上下文学习（ICL）成为创业新赛道，创业者可以利用多模态上下文让机器人更好地理解和执行任务。量子位报道了该领域的兴起，指出这是继大模型之后的下一波技术浪潮。对于AI创业公司来说，这是一个值得关注的蓝海市场。</p>
+          <div class="acc-footer"><span class="acc-tag">具身智能创业公司</span><a href="https://www.qbitai.com/2026/09/484897.html" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">05</span>
+          <span class="acc-text">OpenAI开发外星思维，探索通用智能新路径</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">OpenAI发布了关于开发外星思维的文章，探讨如何设计超越人类认知的AI系统。文章指出，这种思维可能带来无法预见的突破。OpenAI的探索表明，AI研究正朝着更根本的方向发展。</p>
+          <div class="acc-footer"><span class="acc-tag">OpenAI</span><a href="https://openai.com/index/an-alien-mind/" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-3">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">💰</span><h2>投资融资</h2></div>
+        <span class="sec-badge">1 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">中科类脑完成数亿元B+轮战略融资</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">中科类脑宣布完成数亿元B+轮融资，由产业龙头领投。这笔资金将用于推动类脑计算技术的研发和应用落地。此次融资表明了市场对类脑智能的浓厚兴趣，也预示着该领域将迎来更快的发展。</p>
+          <div class="acc-footer"><span class="acc-tag">数亿人民币</span><a href="https://www.qbitai.com/2026/09/485039.html" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-4">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">⚡</span><h2>技术突破</h2></div>
+        <span class="sec-badge">2 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">MathKernel：一个证据感知的多引擎数学内核和MCP服务器</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">MathKernel是一个开源的数学内核，它集成了多个计算引擎，并能提供证据感知的答案。该项目在GitHub上发布，旨在为数学计算提供一个统一的接口。这一工具的出现，可能方便数学家和工程师进行复杂计算。</p>
+          <div class="acc-footer"><a href="https://github.com/Staatsgeheim/MathKernel" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">利用嵌入的通用几何，突破AI理解瓶颈</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">一篇arXiv论文提出，嵌入的通用几何结构可以被用来改进AI的理解能力。研究团队探索了不同嵌入空间之间的共性，并开发了一种利用这些几何属性的方法。这项研究有望推动机器学习的发展，特别是在迁移学习等领域。</p>
+          <div class="acc-footer"><a href="https://arxiv.org/abs/2505.12540" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-5">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">📦</span><h2>产品上线</h2></div>
+        <span class="sec-badge">3 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">Show HN：GET Together——一个无需POST的社交网络</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">一款名为GET Together的社交网络在Hacker News上发布，它通过仅使用HTTP GET方法来实现交互。这个设计旨在简化网络请求并提高安全。该社交网络为开发者提供了一个有趣的技术实验，可能激发更多创意的网络应用。</p>
+          <div class="acc-footer"><span class="acc-tag">GET Together</span><a href="https://gettogether.dev" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">Show HN：Mador——50行代码让DOM响应式</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">Mador是一个极简的库，仅用80行代码便让任何DOM元素变得响应式。它基于Proxy状态元组，显著降低了前端开发的复杂性。开发者可以快速实现数据驱动界面，并保持代码的透明和可控。</p>
+          <div class="acc-footer"><span class="acc-tag">Mador</span><a href="https://github.com/marsbos/mador" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">FlexGanttFX正式开源，提供强大甘特图控件</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">InfoQ报道，FlexGanttFX作为JavaFX甘特图控件已正式开源。该项目提供了丰富的交互式甘特图功能，为开发者提供了免费且强大的工具。开源版本将吸引更多开发者使用并贡献代码，加快项目演进。</p>
+          <div class="acc-footer"><span class="acc-tag">FlexGanttFX</span><a href="https://www.infoq.cn/article/BLyA80LXfvGII85FGmw8?utm_source=rss&utm_medium=article" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-6">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">🎓</span><h2>AI 教育资讯</h2></div>
+        <span class="sec-badge">1 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">Ask HN：如何管理技能文件？</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">有用户在Hacker News上询问如何管理技能文件，包括寻找、组织和改进技能。大家讨论了不同的策略和工具。该话题反映了AI模型时代对技能管理的需求，可能催生一些实用工具的开发。</p>
+          <div class="acc-footer"><a href="https://news.ycombinator.com/item?id=49589914" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+    <section class="section" id="sec-7">
+      <div class="sec-header">
+        <div class="sec-header-left"><span class="sec-icon">🚀</span><h2>创业机会</h2></div>
+        <span class="sec-badge">3 条</span>
+      </div>
+      
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">01</span>
+          <span class="acc-text">利用LLM写作的风险与机遇</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">坎特里尔的观点提醒了利用LLM写作的潜在弊端，但也暗含了机会。适合内容创作者、自由撰稿人和公关人员。切入点可以是提供“人类化改写”服务，使用AI草稿再人工优化，收费按篇计算。</p>
+          <div class="acc-footer"><span class="acc-tag">内容服务</span><a href="https://bcantrill.dtrace.org/2025/12/05/your-intellectual-fly-is-open/" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">02</span>
+          <span class="acc-text">成为数学计算顾问</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">MathKernel出现，适合数学、物理、工程等领域的研究者或学生。可以作为专家为用户提供问题解答和计算服务，通过博客或视频吸引客户，按项目收费。</p>
+          <div class="acc-footer"><span class="acc-tag">知识付费</span><a href="https://github.com/Staatsgeheim/MathKernel" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+      <details class="acc-item">
+        <summary class="acc-title">
+          <span class="acc-index">03</span>
+          <span class="acc-text">开源技术支持服务</span>
+          <span class="acc-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <p class="acc-summary">NetBSD和Nitter等开源项目兴起，需要技术维护和支持。适合精通Linux或开源软件的开发者。可提供定制安装、故障排查、安全审计等服务，按小时计费。</p>
+          <div class="acc-footer"><span class="acc-tag">技术咨询</span><a href="https://www.netbsd.org/gallery/research.html" target="_blank" rel="noopener" class="acc-source-link">
+           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px">
+             <path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9M10 2h4m0 0v4m0-4L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>查看原文</a></div>
+        </div>
+      </details>
+    </section>
+  </main>
+</div>
+<footer>
+  <div class="footer-left">Joy 每日新闻播报 · 2026-09-07 · 星期一</div>
+  <div class="footer-right">Powered by DeepSeek</div>
+</footer>
+</body>
+</html>
